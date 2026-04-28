@@ -1,0 +1,6 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #111; }
+:root {
+  --blue: #4C9BE8; --green: #2A9D8F; --red: #E63946;
+  --orange: #F4A261; --sidebar: #1a1a2e; --card: #ffffff;
+}
