@@ -162,13 +162,13 @@ export default function SectorComparison() {
                   onClick={() => setExpandedSector(expandedSector === row.name ? null : row.name)}
                   style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535', cursor: 'pointer' }}
                 >
-                  <td style={{ ...td, color: '#fff', textAlign: 'left' }}>
+                  <td style={{ ...td, color: '#f5c518', textAlign: 'left' }}>
                     <span style={{ marginRight: 8, color: '#4C9BB8', fontSize: 11 }}>
                       {expandedSector === row.name ? '▼' : '▶'}
                     </span>
                     {row.name}
                   </td>
-                  <td style={{ ...td, textAlign: 'center', color: '#ddd' }}>{row.count}</td>
+                  <td style={{ ...td, textAlign: 'center', color: '#f5c518' }}>{row.count}</td>
                   <td style={{ ...td, color: colorVal(row.monthly_revenue_growth) }}>{fmt(row.monthly_revenue_growth)}</td>
                   <td style={{ ...td, color: colorVal(row.gross_rate_chg) }}>{fmt(row.gross_rate_chg)}</td>
                   <td style={{ ...td, color: colorVal(row.op_rate_chg) }}>{fmt(row.op_rate_chg)}</td>
