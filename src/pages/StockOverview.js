@@ -39,6 +39,12 @@ export default function StockOverview({ ticker }) {
     }
   };
 
+  if (!ticker) return (
+    <div style={{ padding: 40, textAlign: 'center', color: '#aaa' }}>
+      <div style={{ fontSize: 48, marginBottom: 16 }}>📈</div>
+      <div style={{ fontSize: 18 }}>請從左側輸入股票代號或名稱</div>
+    </div>
+  );
   if (loading) return <div className="loading">⏳ 載入中...</div>;
   if (!info) return <div className="loading">找不到股票資料</div>;
 
