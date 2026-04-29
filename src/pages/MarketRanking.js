@@ -1,69 +1,138 @@
 import React, { useState, useEffect } from 'react';
 import { getRanking } from '../api';
 
+const SORT_FIELDS = [
+  { key: 'rev_yoy', label: '月營收年增率' },
+  { key: 'gross_rate_chg', label: '毛利率季增' },
+  { key: 'op_rate_chg', label: '營益率季增' },
+  { key: 'op_income_yoy', label: '營業利益年增率' },
+];
+
 export default function MarketRanking({ setTicker }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [selectedIndustry, setSelectedIndustry] = useState(null);
+  const [sortField, setSortField] = useState('rev_yoy');
+  const [sortDir, setSortDir] = useState('desc');
+  const [filterIndustry, setFilterIndustry] = useState('');
+  const [displayCount, setDisplayCount] = useState(100);
+  const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
-    getRanking().then(d => { setData(d); setLoading(false); });
+    getRanking().then(rows => {
+      const processed = rows.map(s => ({
+        ...s,
+        gross_rate_chg: (s.gross_rate != null && s.prev_gross_rate != null)
+          ? Number(s.gross_rate) - Number(s.prev_gross_rate) : null,
+        op_rate_chg: (s.op_income != null && s.prev_op_income != null && s.rev != null && Number(s.rev) !== 0)
+          ? (Number(s.op_income) - Number(s.prev_op_income)) / Math.abs(Number(s.rev)) * 100 : null,
+        op_income_yoy: (s.op_income != null && s.prev_year_op_income != null && Number(s.prev_year_op_income) !== 0)
+          ? (Number(s.op_income) - Number(s.prev_year_op_income)) / Math.abs(Number(s.prev_year_op_income)) * 100 : null,
+        cur_rev_b: s.cur_rev != null ? (Number(s.cur_rev) / 100000).toFixed(2) : null,
+        prev_rev_b: s.prev_rev != null ? (Number(s.prev_rev) / 100000).toFixed(2) : null,
+      }));
+      setData(processed);
+      setLoading(false);
+    });
   }, []);
 
   if (loading) return <div className="loading">⏳ 載入全市場資料...</div>;
 
-  // 按子產業分組
-  const industries = {};
-  data.forEach(row => {
-    const key = row.sub_industry || row.industry || '其他';
-    if (!industries[key]) industries[key] = [];
-    industries[key].push(row);
+  // 篩選
+  let filtered = data;
+  if (filterIndustry.trim()) {
+    filtered = filtered.filter(r =>
+      (r.sub_industry || '').includes(filterIndustry.trim()) ||
+      (r.name || '').includes(filterIndustry.trim())
+    );
+  }
+
+  // 排序
+  filtered = [...filtered].sort((a, b) => {
+    const va = a[sortField] ?? -Infinity;
+    const vb = b[sortField] ?? -Infinity;
+    return sortDir === 'desc' ? vb - va : va - vb;
   });
 
-  return (
-    <div>
-      <h2 style={{ marginBottom: 16, fontSize: 22, fontWeight: 700 }}>🏆 全市場類股排名</h2>
-      {Object.entries(industries).map(([industry, stocks]) => {
-        const avgGross = stocks.filter(s => s.gross_rate).reduce((a, b) => a + b.gross_rate, 0) / stocks.filter(s => s.gross_rate).length;
-        return (
-          <div key={industry} className="card" style={{ marginBottom: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
-              onClick={() => setSelectedIndustry(selectedIndustry === industry ? null : industry)}>
-              <span style={{ fontWeight: 700, fontSize: 15 }}>{industry}</span>
-              <div style={{ display: 'flex', gap: 20, fontSize: 13, color: '#666' }}>
-                <span>{stocks.length} 檔</span>
-                <span>平均毛利率 {isNaN(avgGross) ? '-' : avgGross.toFixed(1) + '%'}</span>
-                <span style={{ color: '#4C9BE8' }}>{selectedIndustry === industry ? '▲ 收合' : '▼ 展開'}</span>
-              </div>
-            </div>
+  const displayed = filtered.slice(0, displayCount);
 
-            {selectedIndustry === industry && (
-              <div style={{ marginTop: 14 }}>
-                <table>
-                  <thead><tr>
-                    <th>代號</th><th>名稱</th><th>毛利率</th><th>月營收年增率</th>
-                  </tr></thead>
-                  <tbody>
-                    {stocks.sort((a, b) => (b.gross_rate || 0) - (a.gross_rate || 0)).map(s => (
-                      <tr key={s.ticker} style={{ cursor: 'pointer' }}
-                        onClick={() => setTicker(s.ticker)}>
-                        <td style={{ color: '#4C9BE8', fontWeight: 600 }}>{s.ticker}</td>
-                        <td>{s.name}</td>
-                        <td className={s.gross_rate > 30 ? 'positive' : ''}>
-                          {s.gross_rate ? `${s.gross_rate.toFixed(1)}%` : '-'}
-                        </td>
-                        <td className={s.rev_yoy > 0 ? 'positive' : s.rev_yoy < 0 ? 'negative' : ''}>
-                          {s.rev_yoy !== '' && s.rev_yoy !== undefined ? `${Number(s.rev_yoy).toFixed(1)}%` : '-'}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        );
-      })}
+  const fmt = v => v == null || v === '' || isNaN(Number(v)) ? '-' : Number(v).toFixed(2) + '%';
+  const colorVal = v => (v == null || isNaN(v)) ? '#ccc' : v > 0 ? '#4ec94e' : v < 0 ? '#e05c5c' : '#ccc';
+
+  return (
+    <div style={{ padding: '8px' }}>
+      <h2 style={{ marginBottom: 16, fontSize: 22, fontWeight: 700 }}>🏆 全市場排名</h2>
+
+      {/* 排序按鈕 */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 12, flexWrap: 'wrap' }}>
+        {SORT_FIELDS.map(f => (
+          <button key={f.key}
+            onClick={() => { if (sortField === f.key) setSortDir(d => d === 'desc' ? 'asc' : 'desc'); else { setSortField(f.key); setSortDir('desc'); } }}
+            style={{ padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', background: sortField === f.key ? '#4C9BB8' : '#2a3a4a', color: '#fff', fontSize: 13, fontWeight: sortField === f.key ? 700 : 400 }}>
+            {f.label} {sortField === f.key ? (sortDir === 'desc' ? '▼' : '▲') : ''}
+          </button>
+        ))}
+      </div>
+
+      {/* 篩選 + 顯示筆數 */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input
+          placeholder="產業篩選（可留空）"
+          value={filterIndustry}
+          onChange={e => setFilterIndustry(e.target.value)}
+          style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #333', background: '#1e2a3a', color: '#fff', width: 200 }}
+        />
+        <div style={{ display: 'flex', gap: 16 }}>
+          {['desc', 'asc'].map(d => (
+            <label key={d} style={{ cursor: 'pointer', color: sortDir === d ? '#4C9BB8' : '#aaa', fontSize: 14 }}>
+              <input type="radio" checked={sortDir === d} onChange={() => setSortDir(d)} style={{ marginRight: 4 }} />
+              {d === 'desc' ? '由高到低' : '由低到高'}
+            </label>
+          ))}
+        </div>
+        <select value={displayCount} onChange={e => setDisplayCount(Number(e.target.value))}
+          style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #333', background: '#1e2a3a', color: '#fff' }}>
+          {[50, 100, 200, 500].map(n => <option key={n} value={n}>顯示 {n} 筆</option>)}
+        </select>
+        <span style={{ color: '#aaa', fontSize: 13 }}>共 {filtered.length} 筆</span>
+      </div>
+
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
+              <th style={th}>代號</th>
+              <th style={{ ...th, textAlign: 'left' }}>名稱</th>
+              <th style={{ ...th, textAlign: 'left' }}>子產業</th>
+              <th style={th}>月營收年增率(%)</th>
+              <th style={th}>本月營收(億)</th>
+              <th style={th}>去年同月(億)</th>
+              <th style={th}>毛利率季增(百分點)</th>
+              <th style={th}>營益率季增(百分點)</th>
+              <th style={th}>營業利益年增率(%)</th>
+            </tr>
+          </thead>
+          <tbody>
+            {displayed.map((row, i) => (
+              <tr key={row.ticker}
+                onClick={() => setTicker && setTicker(row.ticker)}
+                style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535', cursor: 'pointer' }}>
+                <td style={{ ...td, color: '#4C9BB8', fontWeight: 700 }}>{row.ticker}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#fff' }}>{row.name}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontSize: 12 }}>{row.sub_industry || '-'}</td>
+                <td style={{ ...td, color: colorVal(row.rev_yoy) }}>{fmt(row.rev_yoy)}</td>
+                <td style={{ ...td, color: '#ccc' }}>{row.cur_rev_b ?? '-'}</td>
+                <td style={{ ...td, color: '#ccc' }}>{row.prev_rev_b ?? '-'}</td>
+                <td style={{ ...td, color: colorVal(row.gross_rate_chg) }}>{fmt(row.gross_rate_chg)}</td>
+                <td style={{ ...td, color: colorVal(row.op_rate_chg) }}>{fmt(row.op_rate_chg)}</td>
+                <td style={{ ...td, color: colorVal(row.op_income_yoy) }}>{fmt(row.op_income_yoy)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }
+
+const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a' };
+const td = { padding: '8px 10px', textAlign: 'right', borderBottom: '1px solid #1e2a3a' };
