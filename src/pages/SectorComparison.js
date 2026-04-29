@@ -3,9 +3,9 @@ import { getRanking } from '../api';
 
 const SORT_FIELDS = [
   { key: 'monthly_revenue_growth', label: '月營收年增率' },
-  { key: 'gross_rate', label: '毛利率季增' },
-  { key: 'operating_rate', label: '營益率季增' },
-  { key: 'revenue_growth', label: '營業利益年增率' },
+  { key: 'gross_rate_chg', label: '毛利率季增百分點' },
+  { key: 'op_rate_chg', label: '營益率季增百分點' },
+  { key: 'op_income_yoy', label: '營業利益年增率' },
 ];
 
 export default function SectorComparison() {
@@ -14,6 +14,7 @@ export default function SectorComparison() {
   const [sortField, setSortField] = useState('monthly_revenue_growth');
   const [sortDir, setSortDir] = useState('desc');
   const [filterIndustry, setFilterIndustry] = useState('');
+  const [expandedSector, setExpandedSector] = useState(null);
 
   useEffect(() => {
     getRanking().then(d => { setData(d); setLoading(false); });
@@ -21,7 +22,6 @@ export default function SectorComparison() {
 
   if (loading) return <div className="loading">⏳ 載入類股資料...</div>;
 
-  // 按子產業分組
   const industries = {};
   data.forEach(row => {
     const key = row.sub_industry || row.industry || '其他';
@@ -29,48 +29,78 @@ export default function SectorComparison() {
     industries[key].push(row);
   });
 
-  // 計算每個產業的平均值
-  const avg = (arr, field) => {
-    const vals = arr.filter(s => s[field] != null && s[field] !== '' && !isNaN(Number(s[field])));
-    if (!vals.length) return null;
-    return vals.reduce((a, b) => a + Number(b[field]), 0) / vals.length;
+  const sumField = (arr, field) =>
+    arr.filter(s => s[field] != null && s[field] !== '' && !isNaN(Number(s[field])))
+       .reduce((a, b) => a + Number(b[field]), 0);
+
+  const hasValid = (arr, field) =>
+    arr.some(s => s[field] != null && s[field] !== '' && !isNaN(Number(s[field])));
+
+  const calcSector = (stocks) => {
+    const cur_rev_total = sumField(stocks, 'cur_rev');
+    const prev_rev_total = sumField(stocks, 'prev_rev');
+    const monthly_revenue_growth = (hasValid(stocks, 'cur_rev') && prev_rev_total !== 0)
+      ? (cur_rev_total - prev_rev_total) / Math.abs(prev_rev_total) * 100 : null;
+
+    const gS = stocks.filter(s => s.gross_rate != null && s.gross_rate !== '' && s.rev != null && s.rev !== '');
+    const rev_sum = gS.reduce((a, b) => a + Number(b.rev), 0);
+    const gp_sum = gS.reduce((a, b) => a + Number(b.gross_rate) / 100 * Number(b.rev), 0);
+    const cur_grate = rev_sum > 0 ? gp_sum / rev_sum * 100 : null;
+
+    const pgS = stocks.filter(s => s.prev_gross_rate != null && s.prev_gross_rate !== '' && s.rev != null && s.rev !== '');
+    const prev_rev_sum = pgS.reduce((a, b) => a + Number(b.rev), 0);
+    const pgp_sum = pgS.reduce((a, b) => a + Number(b.prev_gross_rate) / 100 * Number(b.rev), 0);
+    const prev_grate = prev_rev_sum > 0 ? pgp_sum / prev_rev_sum * 100 : null;
+    const gross_rate_chg = (cur_grate != null && prev_grate != null) ? cur_grate - prev_grate : null;
+
+    const opS = stocks.filter(s => s.op_income != null && s.op_income !== '' && s.rev != null && s.rev !== '');
+    const op_sum = opS.reduce((a, b) => a + Number(b.op_income), 0);
+    const op_rev_sum = opS.reduce((a, b) => a + Number(b.rev), 0);
+    const cur_oprate = op_rev_sum > 0 ? op_sum / op_rev_sum * 100 : null;
+
+    const popS = stocks.filter(s => s.prev_op_income != null && s.prev_op_income !== '' && s.rev != null && s.rev !== '');
+    const pop_sum = popS.reduce((a, b) => a + Number(b.prev_op_income), 0);
+    const pop_rev_sum = popS.reduce((a, b) => a + Number(b.rev), 0);
+    const prev_oprate = pop_rev_sum > 0 ? pop_sum / pop_rev_sum * 100 : null;
+    const op_rate_chg = (cur_oprate != null && prev_oprate != null) ? cur_oprate - prev_oprate : null;
+
+    const op_income_sum = sumField(stocks, 'op_income');
+    const prev_year_op_sum = sumField(stocks, 'prev_year_op_income');
+    const op_income_yoy = (hasValid(stocks, 'op_income') && hasValid(stocks, 'prev_year_op_income') && prev_year_op_sum !== 0)
+      ? (op_income_sum - prev_year_op_sum) / Math.abs(prev_year_op_sum) * 100 : null;
+
+    return { monthly_revenue_growth, gross_rate_chg, op_rate_chg, op_income_yoy };
   };
 
-  // 計算營益率季增：(op_income - prev_op_income) / abs(prev_op_income) * 100
-  const avgOpRateGrowth = (stocks) => {
-    const vals = stocks.filter(s =>
-      s.op_income != null && s.prev_op_income != null &&
-      s.prev_op_income !== 0 && s.prev_op_income !== ''
-    ).map(s => (Number(s.op_income) - Number(s.prev_op_income)) / Math.abs(Number(s.prev_op_income)) * 100);
-    if (!vals.length) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
-  };
+  // 計算個別公司指標
+  const calcCompany = (s) => {
+    const cur_rev = Number(s.cur_rev);
+    const prev_rev = Number(s.prev_rev);
+    const monthly_revenue_growth = (s.cur_rev != null && s.prev_rev != null && prev_rev !== 0)
+      ? (cur_rev - prev_rev) / Math.abs(prev_rev) * 100 : null;
 
-  // 計算毛利率季增：gross_rate - prev_gross_rate
-  const avgGrossRateGrowth = (stocks) => {
-    const vals = stocks.filter(s =>
-      s.gross_rate != null && s.prev_gross_rate != null &&
-      s.gross_rate !== '' && s.prev_gross_rate !== ''
-    ).map(s => Number(s.gross_rate) - Number(s.prev_gross_rate));
-    if (!vals.length) return null;
-    return vals.reduce((a, b) => a + b, 0) / vals.length;
+    const gross_rate_chg = (s.gross_rate != null && s.prev_gross_rate != null)
+      ? Number(s.gross_rate) - Number(s.prev_gross_rate) : null;
+
+    const rev = Number(s.rev);
+    const cur_oprate = (s.op_income != null && rev !== 0) ? Number(s.op_income) / rev * 100 : null;
+    const prev_oprate = (s.prev_op_income != null && rev !== 0) ? Number(s.prev_op_income) / rev * 100 : null;
+    const op_rate_chg = (cur_oprate != null && prev_oprate != null) ? cur_oprate - prev_oprate : null;
+
+    const op_income_yoy = (s.op_income != null && s.prev_year_op_income != null && Number(s.prev_year_op_income) !== 0)
+      ? (Number(s.op_income) - Number(s.prev_year_op_income)) / Math.abs(Number(s.prev_year_op_income)) * 100 : null;
+
+    return { monthly_revenue_growth, gross_rate_chg, op_rate_chg, op_income_yoy };
   };
 
   let sectorRows = Object.entries(industries).map(([name, stocks]) => ({
-    name,
-    count: stocks.length,
-    monthly_revenue_growth: avg(stocks, 'rev_yoy'),
-    gross_rate: avgGrossRateGrowth(stocks),
-    operating_rate: avgOpRateGrowth(stocks),
-    revenue_growth: avg(stocks, 'rev_yoy'),
+    name, count: stocks.length, stocks, ...calcSector(stocks)
   }));
 
-  // 篩選
   if (filterIndustry.trim()) {
     sectorRows = sectorRows.filter(r => r.name.includes(filterIndustry.trim()));
   }
 
-  // 排序
   sectorRows.sort((a, b) => {
     const va = a[sortField] ?? -Infinity;
     const vb = b[sortField] ?? -Infinity;
@@ -78,6 +108,7 @@ export default function SectorComparison() {
   });
 
   const fmt = v => v == null || isNaN(v) ? 'N/A' : v.toFixed(2) + '%';
+  const colorVal = v => v == null ? '#888' : v > 0 ? '#4ec94e' : v < 0 ? '#e05c5c' : '#888';
 
   return (
     <div style={{ padding: '8px' }}>
@@ -93,27 +124,16 @@ export default function SectorComparison() {
         <span style={{ color: '#888', fontSize: 13 }}>共 {sectorRows.length} 個子產業</span>
       </div>
 
-      {/* 排序按鈕 */}
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
         {SORT_FIELDS.map(f => (
-          <button
-            key={f.key}
-            onClick={() => {
-              if (sortField === f.key) setSortDir(d => d === 'desc' ? 'asc' : 'desc');
-              else { setSortField(f.key); setSortDir('desc'); }
-            }}
-            style={{
-              padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer',
-              background: sortField === f.key ? '#4C9BB8' : '#2a3a4a',
-              color: '#fff', fontSize: 13, fontWeight: sortField === f.key ? 700 : 400,
-            }}
-          >
+          <button key={f.key}
+            onClick={() => { if (sortField === f.key) setSortDir(d => d === 'desc' ? 'asc' : 'desc'); else { setSortField(f.key); setSortDir('desc'); } }}
+            style={{ padding: '6px 14px', borderRadius: 6, border: 'none', cursor: 'pointer', background: sortField === f.key ? '#4C9BB8' : '#2a3a4a', color: '#fff', fontSize: 13, fontWeight: sortField === f.key ? 700 : 400 }}>
             {f.label} {sortField === f.key ? (sortDir === 'desc' ? '▼' : '▲') : ''}
           </button>
         ))}
       </div>
 
-      {/* 排序方向 */}
       <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
         {['desc', 'asc'].map(d => (
           <label key={d} style={{ cursor: 'pointer', color: sortDir === d ? '#4C9BB8' : '#888', fontSize: 14 }}>
@@ -127,24 +147,51 @@ export default function SectorComparison() {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
             <tr style={{ background: '#1e2a3a', color: '#aaa' }}>
-              <th style={th}>子產業</th>
-              <th style={th}>家數</th>
+              <th style={th}>子產業</th><th style={th}>家數</th>
               <th style={th}>月營收年增率(%)</th>
-              <th style={th}>本季毛利率季增(%)</th>
-              <th style={th}>本季營益率季增(%)</th>
+              <th style={th}>本季毛利率季增(百分點)</th>
+              <th style={th}>本季營益率季增(百分點)</th>
               <th style={th}>營業利益年增率(%)</th>
             </tr>
           </thead>
           <tbody>
             {sectorRows.map((row, i) => (
-              <tr key={row.name} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={td}>{row.name}</td>
-                <td style={{ ...td, textAlign: 'center' }}>{row.count}</td>
-                <td style={{ ...td, color: colorVal(row.monthly_revenue_growth) }}>{fmt(row.monthly_revenue_growth)}</td>
-                <td style={{ ...td, color: colorVal(row.gross_rate) }}>{fmt(row.gross_rate)}</td>
-                <td style={{ ...td, color: colorVal(row.operating_rate) }}>{fmt(row.operating_rate)}</td>
-                <td style={{ ...td, color: colorVal(row.revenue_growth) }}>{fmt(row.revenue_growth)}</td>
-              </tr>
+              <React.Fragment key={row.name}>
+                {/* 類股列 */}
+                <tr
+                  onClick={() => setExpandedSector(expandedSector === row.name ? null : row.name)}
+                  style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535', cursor: 'pointer' }}
+                >
+                  <td style={td}>
+                    <span style={{ marginRight: 6, color: '#4C9BB8' }}>
+                      {expandedSector === row.name ? '▼' : '▶'}
+                    </span>
+                    {row.name}
+                  </td>
+                  <td style={{ ...td, textAlign: 'center' }}>{row.count}</td>
+                  <td style={{ ...td, color: colorVal(row.monthly_revenue_growth) }}>{fmt(row.monthly_revenue_growth)}</td>
+                  <td style={{ ...td, color: colorVal(row.gross_rate_chg) }}>{fmt(row.gross_rate_chg)}</td>
+                  <td style={{ ...td, color: colorVal(row.op_rate_chg) }}>{fmt(row.op_rate_chg)}</td>
+                  <td style={{ ...td, color: colorVal(row.op_income_yoy) }}>{fmt(row.op_income_yoy)}</td>
+                </tr>
+
+                {/* 展開的個別公司 */}
+                {expandedSector === row.name && row.stocks.map(s => {
+                  const c = calcCompany(s);
+                  return (
+                    <tr key={s.ticker} style={{ background: '#0f1820' }}>
+                      <td style={{ ...td, paddingLeft: 32, color: '#ccc' }}>
+                        {s.ticker} {s.name}
+                      </td>
+                      <td style={{ ...td, textAlign: 'center', color: '#888' }}>—</td>
+                      <td style={{ ...td, color: colorVal(c.monthly_revenue_growth) }}>{fmt(c.monthly_revenue_growth)}</td>
+                      <td style={{ ...td, color: colorVal(c.gross_rate_chg) }}>{fmt(c.gross_rate_chg)}</td>
+                      <td style={{ ...td, color: colorVal(c.op_rate_chg) }}>{fmt(c.op_rate_chg)}</td>
+                      <td style={{ ...td, color: colorVal(c.op_income_yoy) }}>{fmt(c.op_income_yoy)}</td>
+                    </tr>
+                  );
+                })}
+              </React.Fragment>
             ))}
           </tbody>
         </table>
@@ -155,4 +202,3 @@ export default function SectorComparison() {
 
 const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a' };
 const td = { padding: '8px 12px', textAlign: 'right', borderBottom: '1px solid #1e2a3a' };
-const colorVal = v => v == null ? '#888' : v > 0 ? '#4ec94e' : v < 0 ? '#e05c5c' : '#888';
