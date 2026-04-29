@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:8000',
+  baseURL: 'https://stock-api-7u52.onrender.com',
 });
 
 export const getCompanies = () => API.get('/api/companies').then(r => r.data);
