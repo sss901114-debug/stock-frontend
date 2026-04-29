@@ -31,18 +31,38 @@ export default function SectorComparison() {
 
   // 計算每個產業的平均值
   const avg = (arr, field) => {
-    const vals = arr.filter(s => s[field] != null && !isNaN(s[field]));
+    const vals = arr.filter(s => s[field] != null && s[field] !== '' && !isNaN(Number(s[field])));
     if (!vals.length) return null;
     return vals.reduce((a, b) => a + Number(b[field]), 0) / vals.length;
+  };
+
+  // 計算營益率季增：(op_income - prev_op_income) / abs(prev_op_income) * 100
+  const avgOpRateGrowth = (stocks) => {
+    const vals = stocks.filter(s =>
+      s.op_income != null && s.prev_op_income != null &&
+      s.prev_op_income !== 0 && s.prev_op_income !== ''
+    ).map(s => (Number(s.op_income) - Number(s.prev_op_income)) / Math.abs(Number(s.prev_op_income)) * 100);
+    if (!vals.length) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
+  };
+
+  // 計算毛利率季增：gross_rate - prev_gross_rate
+  const avgGrossRateGrowth = (stocks) => {
+    const vals = stocks.filter(s =>
+      s.gross_rate != null && s.prev_gross_rate != null &&
+      s.gross_rate !== '' && s.prev_gross_rate !== ''
+    ).map(s => Number(s.gross_rate) - Number(s.prev_gross_rate));
+    if (!vals.length) return null;
+    return vals.reduce((a, b) => a + b, 0) / vals.length;
   };
 
   let sectorRows = Object.entries(industries).map(([name, stocks]) => ({
     name,
     count: stocks.length,
-    monthly_revenue_growth: avg(stocks, 'monthly_revenue_growth'),
-    gross_rate: avg(stocks, 'gross_rate'),
-    operating_rate: avg(stocks, 'operating_rate'),
-    revenue_growth: avg(stocks, 'revenue_growth'),
+    monthly_revenue_growth: avg(stocks, 'rev_yoy'),
+    gross_rate: avgGrossRateGrowth(stocks),
+    operating_rate: avgOpRateGrowth(stocks),
+    revenue_growth: avg(stocks, 'rev_yoy'),
   }));
 
   // 篩選
@@ -110,8 +130,8 @@ export default function SectorComparison() {
               <th style={th}>子產業</th>
               <th style={th}>家數</th>
               <th style={th}>月營收年增率(%)</th>
-              <th style={th}>本季毛利率(%)</th>
-              <th style={th}>本季營益率(%)</th>
+              <th style={th}>本季毛利率季增(%)</th>
+              <th style={th}>本季營益率季增(%)</th>
               <th style={th}>營業利益年增率(%)</th>
             </tr>
           </thead>
