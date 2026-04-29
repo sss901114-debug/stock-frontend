@@ -37,8 +37,13 @@ export default function MarketRanking({ setTicker }) {
 
   if (loading) return <div className="loading">⏳ 載入全市場資料...</div>;
 
-  // 篩選
-  let filtered = data;
+  // 篩選：剔除本月或去年同月營收未達0.3億(30000千元)的個股
+  let filtered = data.filter(r => {
+    const cur = Number(r.cur_rev);
+    const prev = Number(r.prev_rev);
+    if (r.cur_rev == null || r.prev_rev == null) return true; // 無月營收資料保留
+    return cur >= 30000 && prev >= 30000;
+  });
   if (filterIndustry.trim()) {
     filtered = filtered.filter(r =>
       (r.sub_industry || '').includes(filterIndustry.trim()) ||
