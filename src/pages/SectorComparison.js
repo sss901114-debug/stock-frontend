@@ -72,22 +72,21 @@ export default function SectorComparison() {
     return { monthly_revenue_growth, gross_rate_chg, op_rate_chg, op_income_yoy };
   };
 
-  // 計算個別公司指標
   const calcCompany = (s) => {
     const cur_rev = Number(s.cur_rev);
     const prev_rev = Number(s.prev_rev);
-    const monthly_revenue_growth = (s.cur_rev != null && s.prev_rev != null && prev_rev !== 0)
+    const monthly_revenue_growth = (s.cur_rev != null && s.cur_rev !== '' && s.prev_rev != null && s.prev_rev !== '' && prev_rev !== 0)
       ? (cur_rev - prev_rev) / Math.abs(prev_rev) * 100 : null;
 
-    const gross_rate_chg = (s.gross_rate != null && s.prev_gross_rate != null)
+    const gross_rate_chg = (s.gross_rate != null && s.gross_rate !== '' && s.prev_gross_rate != null && s.prev_gross_rate !== '')
       ? Number(s.gross_rate) - Number(s.prev_gross_rate) : null;
 
     const rev = Number(s.rev);
-    const cur_oprate = (s.op_income != null && rev !== 0) ? Number(s.op_income) / rev * 100 : null;
-    const prev_oprate = (s.prev_op_income != null && rev !== 0) ? Number(s.prev_op_income) / rev * 100 : null;
+    const cur_oprate = (s.op_income != null && s.op_income !== '' && rev !== 0) ? Number(s.op_income) / rev * 100 : null;
+    const prev_oprate = (s.prev_op_income != null && s.prev_op_income !== '' && rev !== 0) ? Number(s.prev_op_income) / rev * 100 : null;
     const op_rate_chg = (cur_oprate != null && prev_oprate != null) ? cur_oprate - prev_oprate : null;
 
-    const op_income_yoy = (s.op_income != null && s.prev_year_op_income != null && Number(s.prev_year_op_income) !== 0)
+    const op_income_yoy = (s.op_income != null && s.op_income !== '' && s.prev_year_op_income != null && s.prev_year_op_income !== '' && Number(s.prev_year_op_income) !== 0)
       ? (Number(s.op_income) - Number(s.prev_year_op_income)) / Math.abs(Number(s.prev_year_op_income)) * 100 : null;
 
     return { monthly_revenue_growth, gross_rate_chg, op_rate_chg, op_income_yoy };
@@ -108,7 +107,7 @@ export default function SectorComparison() {
   });
 
   const fmt = v => v == null || isNaN(v) ? 'N/A' : v.toFixed(2) + '%';
-  const colorVal = v => v == null ? '#888' : v > 0 ? '#4ec94e' : v < 0 ? '#e05c5c' : '#888';
+  const colorVal = v => v == null ? '#aaa' : v > 0 ? '#4ec94e' : v < 0 ? '#e05c5c' : '#aaa';
 
   return (
     <div style={{ padding: '8px' }}>
@@ -121,7 +120,7 @@ export default function SectorComparison() {
           onChange={e => setFilterIndustry(e.target.value)}
           style={{ padding: '6px 10px', borderRadius: 6, border: '1px solid #333', background: '#1e2a3a', color: '#fff', width: 200 }}
         />
-        <span style={{ color: '#888', fontSize: 13 }}>共 {sectorRows.length} 個子產業</span>
+        <span style={{ color: '#ccc', fontSize: 13 }}>共 {sectorRows.length} 個子產業</span>
       </div>
 
       <div style={{ display: 'flex', gap: 8, marginBottom: 16, flexWrap: 'wrap' }}>
@@ -136,7 +135,7 @@ export default function SectorComparison() {
 
       <div style={{ marginBottom: 16, display: 'flex', gap: 16 }}>
         {['desc', 'asc'].map(d => (
-          <label key={d} style={{ cursor: 'pointer', color: sortDir === d ? '#4C9BB8' : '#888', fontSize: 14 }}>
+          <label key={d} style={{ cursor: 'pointer', color: sortDir === d ? '#4C9BB8' : '#aaa', fontSize: 14 }}>
             <input type="radio" checked={sortDir === d} onChange={() => setSortDir(d)} style={{ marginRight: 4 }} />
             {d === 'desc' ? '由高到低' : '由低到高'}
           </label>
@@ -146,8 +145,9 @@ export default function SectorComparison() {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 14 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a', color: '#aaa' }}>
-              <th style={th}>子產業</th><th style={th}>家數</th>
+            <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
+              <th style={th}>子產業</th>
+              <th style={{ ...th, textAlign: 'center' }}>家數</th>
               <th style={th}>月營收年增率(%)</th>
               <th style={th}>本季毛利率季增(百分點)</th>
               <th style={th}>本季營益率季增(百分點)</th>
@@ -162,13 +162,13 @@ export default function SectorComparison() {
                   onClick={() => setExpandedSector(expandedSector === row.name ? null : row.name)}
                   style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535', cursor: 'pointer' }}
                 >
-                  <td style={td}>
-                    <span style={{ marginRight: 6, color: '#4C9BB8' }}>
+                  <td style={{ ...td, color: '#fff', textAlign: 'left' }}>
+                    <span style={{ marginRight: 8, color: '#4C9BB8', fontSize: 11 }}>
                       {expandedSector === row.name ? '▼' : '▶'}
                     </span>
                     {row.name}
                   </td>
-                  <td style={{ ...td, textAlign: 'center' }}>{row.count}</td>
+                  <td style={{ ...td, textAlign: 'center', color: '#ddd' }}>{row.count}</td>
                   <td style={{ ...td, color: colorVal(row.monthly_revenue_growth) }}>{fmt(row.monthly_revenue_growth)}</td>
                   <td style={{ ...td, color: colorVal(row.gross_rate_chg) }}>{fmt(row.gross_rate_chg)}</td>
                   <td style={{ ...td, color: colorVal(row.op_rate_chg) }}>{fmt(row.op_rate_chg)}</td>
@@ -179,11 +179,12 @@ export default function SectorComparison() {
                 {expandedSector === row.name && row.stocks.map(s => {
                   const c = calcCompany(s);
                   return (
-                    <tr key={s.ticker} style={{ background: '#0f1820' }}>
-                      <td style={{ ...td, paddingLeft: 32, color: '#ccc' }}>
-                        {s.ticker} {s.name}
+                    <tr key={s.ticker} style={{ background: '#0d1822' }}>
+                      <td style={{ ...td, paddingLeft: 36, color: '#ccc', textAlign: 'left' }}>
+                        <span style={{ color: '#666', marginRight: 6 }}>{s.ticker}</span>
+                        {s.name}
                       </td>
-                      <td style={{ ...td, textAlign: 'center', color: '#888' }}>—</td>
+                      <td style={{ ...td, textAlign: 'center', color: '#555' }}>—</td>
                       <td style={{ ...td, color: colorVal(c.monthly_revenue_growth) }}>{fmt(c.monthly_revenue_growth)}</td>
                       <td style={{ ...td, color: colorVal(c.gross_rate_chg) }}>{fmt(c.gross_rate_chg)}</td>
                       <td style={{ ...td, color: colorVal(c.op_rate_chg) }}>{fmt(c.op_rate_chg)}</td>
