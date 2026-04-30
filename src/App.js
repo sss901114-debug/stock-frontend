@@ -61,7 +61,7 @@ export default function App() {
               <Route path="/" element={<StockOverview ticker={ticker} />} />
               <Route path="/ranking" element={<MarketRanking setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/sector" element={<SectorComparison setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
-              <Route path="/portfolio" element={<Portfolio setTicker={setTicker} />} />
+              <Route path="/portfolio" element={<Portfolio setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} />} />
             </Routes>
           </div>
         </main>

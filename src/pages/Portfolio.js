@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { getPortfolioGroups, getPortfolioStocks, addPortfolio, removePortfolio, getCompanies } from '../api';
+import { getCompanies } from '../api';
 
-export default function Portfolio({ setTicker }) {
-  const [groups, setGroups] = useState([]);
-  const [selectedGroup, setSelectedGroup] = useState(1);
-  const [stocks, setStocks] = useState([]);
+export default function Portfolio({ setTicker, watchlist, addToWatchlist, removeFromWatchlist }) {
   const [companies, setCompanies] = useState([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
 
   useEffect(() => {
-    getPortfolioGroups().then(g => { setGroups(g); });
     getCompanies().then(setCompanies);
   }, []);
-
-  useEffect(() => {
-    getPortfolioStocks(selectedGroup).then(setStocks);
-  }, [selectedGroup]);
 
   useEffect(() => {
     if (!search) { setResults([]); return; }
@@ -27,37 +19,19 @@ export default function Portfolio({ setTicker }) {
   }, [search, companies]);
 
   const handleAdd = (ticker, name) => {
-    addPortfolio(selectedGroup, ticker, name).then(() => {
-      getPortfolioStocks(selectedGroup).then(setStocks);
-      setSearch(''); setResults([]);
-    });
-  };
-
-  const handleRemove = (ticker) => {
-    removePortfolio(selectedGroup, ticker).then(() => {
-      getPortfolioStocks(selectedGroup).then(setStocks);
-    });
+    addToWatchlist(ticker, name);
+    setSearch('');
+    setResults([]);
   };
 
   return (
     <div>
       <h2 style={{ marginBottom: 16, fontSize: 22, fontWeight: 700 }}>⭐ 私房股</h2>
 
-      {/* 組別選擇 */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, flexWrap: 'wrap' }}>
-        {groups.map(g => (
-          <button key={g.group_no} onClick={() => setSelectedGroup(g.group_no)}
-            style={{
-              padding: '8px 18px', borderRadius: 8, border: '1px solid #ddd', cursor: 'pointer',
-              background: selectedGroup === g.group_no ? 'var(--blue)' : 'white',
-              color: selectedGroup === g.group_no ? 'white' : '#333', fontWeight: 600
-            }}>
-            {g.group_name}
-          </button>
-        ))}
+      <div style={{ marginBottom: 16, color: '#888', fontSize: 13 }}>
+        最多追蹤 10 檔，可在全市場排名或類股比較中直接勾選加入，或用下方搜尋加入。
       </div>
 
-      {/* 搜尋加入 */}
       <div className="card">
         <div className="section-title">🔍 搜尋加入個股</div>
         <div style={{ position: 'relative', maxWidth: 400 }}>
@@ -80,21 +54,20 @@ export default function Portfolio({ setTicker }) {
         </div>
       </div>
 
-      {/* 股票清單 */}
       <div className="card">
-        <div className="section-title">📋 目前持股</div>
-        {stocks.length === 0
-          ? <div style={{ color: '#888', padding: '20px 0' }}>尚無個股，請用上方搜尋加入</div>
+        <div className="section-title">📋 目前私房股（{watchlist.length}/10）</div>
+        {watchlist.length === 0
+          ? <div style={{ color: '#888', padding: '20px 0' }}>尚無個股，請用上方搜尋或在排名頁面勾選加入</div>
           : <table>
               <thead><tr><th>代號</th><th>名稱</th><th>操作</th></tr></thead>
               <tbody>
-                {stocks.map(s => (
+                {watchlist.map(s => (
                   <tr key={s.ticker}>
                     <td style={{ color: '#4C9BE8', fontWeight: 600, cursor: 'pointer' }}
                       onClick={() => setTicker(s.ticker)}>{s.ticker}</td>
                     <td>{s.name}</td>
                     <td>
-                      <button onClick={() => handleRemove(s.ticker)}
+                      <button onClick={() => removeFromWatchlist(s.ticker)}
                         style={{ padding: '4px 12px', borderRadius: 6, border: '1px solid #E63946', background: 'white', color: '#E63946', cursor: 'pointer', fontSize: 13 }}>
                         移除
                       </button>
