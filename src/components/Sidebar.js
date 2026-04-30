@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { getCompanies, getWatchlist } from '../api';
+import { getCompanies } from '../api';
 import './Sidebar.css';
 
-export default function Sidebar({ ticker, setTicker }) {
+export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchlist }) {
   const [companies, setCompanies] = useState([]);
-  const [watchlist, setWatchlist] = useState([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
 
   useEffect(() => {
     getCompanies().then(setCompanies);
-    getWatchlist().then(setWatchlist);
   }, []);
 
   useEffect(() => {
@@ -55,14 +53,17 @@ export default function Sidebar({ ticker, setTicker }) {
       </div>
 
       <div className="sidebar-section">
-        <div className="sidebar-label">⭐ 追蹤清單</div>
+        <div className="sidebar-label">⭐ 私房股 ({watchlist.length}/10)</div>
         {watchlist.length === 0
           ? <div className="empty-list">尚無追蹤</div>
           : watchlist.map(w => (
-            <div key={w.ticker} className="watchlist-item"
-              onClick={() => setTicker(w.ticker)}>
-              <span>{w.ticker}</span>
-              <span className="wl-name">{w.name}</span>
+            <div key={w.ticker} className="watchlist-item">
+              <span onClick={() => setTicker(w.ticker)} style={{ cursor: 'pointer', flex: 1 }}>
+                <span>{w.ticker}</span>
+                <span className="wl-name">{w.name}</span>
+              </span>
+              <span onClick={() => removeFromWatchlist(w.ticker)}
+                style={{ cursor: 'pointer', color: '#e05c5c', marginLeft: 6, fontSize: 14, lineHeight: 1 }}>✕</span>
             </div>
           ))
         }

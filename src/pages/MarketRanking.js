@@ -8,7 +8,7 @@ const SORT_FIELDS = [
   { key: 'op_income_yoy', label: '營業利益年增率' },
 ];
 
-export default function MarketRanking({ setTicker }) {
+export default function MarketRanking({ setTicker, watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState('rev_yoy');
@@ -103,6 +103,7 @@ export default function MarketRanking({ setTicker }) {
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
             <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
+              <th style={th}>私房股</th>
               <th style={th}>代號</th>
               <th style={{ ...th, textAlign: 'left' }}>名稱</th>
               <th style={{ ...th, textAlign: 'left' }}>子產業</th>
@@ -117,9 +118,23 @@ export default function MarketRanking({ setTicker }) {
           <tbody>
             {displayed.map((row, i) => (
               <tr key={row.ticker}
-                onClick={() => setTicker && setTicker(row.ticker)}
-                style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535', cursor: 'pointer' }}>
-                <td style={{ ...td, color: '#4C9BB8', fontWeight: 700 }}>{row.ticker}</td>
+                style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'center' }}>
+                  <input type="checkbox"
+                    checked={isInWatchlist ? isInWatchlist(row.ticker) : false}
+                    onChange={e => {
+                      e.stopPropagation();
+                      if (isInWatchlist && isInWatchlist(row.ticker)) {
+                        removeFromWatchlist && removeFromWatchlist(row.ticker);
+                      } else {
+                        addToWatchlist && addToWatchlist(row.ticker, row.name);
+                      }
+                    }}
+                    style={{ cursor: 'pointer', width: 16, height: 16 }}
+                  />
+                </td>
+                <td style={{ ...td, color: '#4C9BB8', fontWeight: 700, cursor: 'pointer' }}
+                  onClick={() => setTicker && setTicker(row.ticker)}>{row.ticker}</td>
                 <td style={{ ...td, textAlign: 'left', color: '#fff' }}>{row.name}</td>
                 <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontSize: 12 }}>{row.sub_industry || '-'}</td>
                 <td style={{ ...td, color: colorVal(row.rev_yoy) }}>{fmt(row.rev_yoy)}</td>

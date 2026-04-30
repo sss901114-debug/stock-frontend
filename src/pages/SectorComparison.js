@@ -8,7 +8,7 @@ const SORT_FIELDS = [
   { key: 'op_income_yoy', label: '營業利益年增率' },
 ];
 
-export default function SectorComparison() {
+export default function SectorComparison({ setTicker, watchlist, addToWatchlist, removeFromWatchlist, isInWatchlist }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [sortField, setSortField] = useState('monthly_revenue_growth');
@@ -148,6 +148,7 @@ export default function SectorComparison() {
             <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
               <th style={th}>子產業</th>
               <th style={{ ...th, textAlign: 'center' }}>家數</th>
+              <th style={{ ...th, textAlign: 'center' }}>私房股</th>
               <th style={th}>月營收年增率(%)</th>
               <th style={th}>本季毛利率季增(百分點)</th>
               <th style={th}>本季營益率季增(百分點)</th>
@@ -169,6 +170,7 @@ export default function SectorComparison() {
                     {row.name}
                   </td>
                   <td style={{ ...td, textAlign: 'center', color: '#f5c518' }}>{row.count}</td>
+                  <td style={{ ...td, textAlign: 'center' }}>—</td>
                   <td style={{ ...td, color: colorVal(row.monthly_revenue_growth) }}>{fmt(row.monthly_revenue_growth)}</td>
                   <td style={{ ...td, color: colorVal(row.gross_rate_chg) }}>{fmt(row.gross_rate_chg)}</td>
                   <td style={{ ...td, color: colorVal(row.op_rate_chg) }}>{fmt(row.op_rate_chg)}</td>
@@ -178,13 +180,29 @@ export default function SectorComparison() {
                 {/* 展開的個別公司 */}
                 {expandedSector === row.name && row.stocks.map(s => {
                   const c = calcCompany(s);
+                  const inWL = isInWatchlist ? isInWatchlist(s.ticker) : false;
                   return (
                     <tr key={s.ticker} style={{ background: '#0d1822' }}>
                       <td style={{ ...td, paddingLeft: 36, color: '#ccc', textAlign: 'left' }}>
-                        <span style={{ color: '#666', marginRight: 6 }}>{s.ticker}</span>
+                        <span style={{ color: '#4C9BB8', marginRight: 6, cursor: 'pointer', fontWeight: 700 }}
+                          onClick={() => setTicker && setTicker(s.ticker)}>{s.ticker}</span>
                         {s.name}
                       </td>
                       <td style={{ ...td, textAlign: 'center', color: '#555' }}>—</td>
+                      <td style={{ ...td, textAlign: 'center' }}>
+                        <input type="checkbox"
+                          checked={inWL}
+                          onChange={e => {
+                            e.stopPropagation();
+                            if (inWL) {
+                              removeFromWatchlist && removeFromWatchlist(s.ticker);
+                            } else {
+                              addToWatchlist && addToWatchlist(s.ticker, s.name);
+                            }
+                          }}
+                          style={{ cursor: 'pointer', width: 16, height: 16 }}
+                        />
+                      </td>
                       <td style={{ ...td, color: colorVal(c.monthly_revenue_growth) }}>{fmt(c.monthly_revenue_growth)}</td>
                       <td style={{ ...td, color: colorVal(c.gross_rate_chg) }}>{fmt(c.gross_rate_chg)}</td>
                       <td style={{ ...td, color: colorVal(c.op_rate_chg) }}>{fmt(c.op_rate_chg)}</td>
