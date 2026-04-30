@@ -37,9 +37,9 @@ export default function StockOverview({ ticker }) {
   if (loading) return <div className="loading">⏳ 載入中...</div>;
   if (!info) return <div className="loading">找不到股票資料</div>;
 
-  const qData = [...quarterly].sort((a, b) => b['期別'] > a['期別'] ? 1 : -1).slice(0, 16);
+  const qData = [...quarterly].sort((a, b) => b['期別'] > a['期別'] ? 1 : -1);
   const qHeaders = qData.map(r => r['期別']);
-  const mData = [...monthly].sort((a, b) => b.period > a.period ? 1 : -1).slice(0, 24);
+  const mData = [...monthly].sort((a, b) => b.period > a.period ? 1 : -1);
 
   const fmt = (v, dec=2) => (v === '' || v == null || isNaN(Number(v))) ? '-' : Number(v).toFixed(dec);
   const colorPos = (v) => (v === '' || v == null || isNaN(Number(v))) ? '#ccc' : Number(v) > 0 ? '#4ec94e' : Number(v) < 0 ? '#e05c5c' : '#ccc';
@@ -219,5 +219,5 @@ export default function StockOverview({ ticker }) {
   );
 }
 
-const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a', color: '#ddd', whiteSpace: 'nowrap' };
+const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a', color: '#ddd', whiteSpace: 'nowrap', background: '#1e2a3a' };
 const td = { padding: '7px 12px', textAlign: 'right', borderBottom: '1px solid #1e2a3a', whiteSpace: 'nowrap' };
