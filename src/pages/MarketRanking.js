@@ -15,7 +15,6 @@ export default function MarketRanking({ setTicker, watchlist, addToWatchlist, re
   const [sortDir, setSortDir] = useState('desc');
   const [filterIndustry, setFilterIndustry] = useState('');
   const [displayCount, setDisplayCount] = useState(100);
-  const [watchlist, setWatchlist] = useState([]);
 
   useEffect(() => {
     getRanking().then(rows => {
