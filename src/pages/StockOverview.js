@@ -42,6 +42,7 @@ export default function StockOverview({ ticker }) {
   const mData = [...monthly].sort((a, b) => b.period > a.period ? 1 : -1);
 
   const fmt = (v, dec=2) => (v === '' || v == null || isNaN(Number(v))) ? '-' : Number(v).toFixed(dec);
+  const fmtN = (v, dec=2) => (v === '' || v == null || isNaN(Number(v))) ? '-' : Number(v).toFixed(dec);
   const colorPos = (v) => (v === '' || v == null || isNaN(Number(v))) ? '#ccc' : Number(v) > 0 ? '#4ec94e' : Number(v) < 0 ? '#e05c5c' : '#ccc';
   const colorNeg = (v) => (v === '' || v == null || isNaN(Number(v))) ? '#ccc' : Number(v) > 0 ? '#e05c5c' : Number(v) < 0 ? '#4ec94e' : '#ccc';
 
@@ -142,16 +143,58 @@ export default function StockOverview({ ticker }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
-              <th style={th}>月份</th>
-              <th style={th}>月營收(億)</th>
+            <tr style={{ background: '#1e2a3a' }}>
+              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
+              {mData.map(r => <th key={r.period} style={th}>{r.period}</th>)}
             </tr>
           </thead>
           <tbody>
-            {mData.map((r, i) => (
-              <tr key={r.period} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, color: '#f5c518' }}>{r.period}</td>
-                <td style={{ ...td, color: '#ccc' }}>{(Number(r.revenue) / 100000).toFixed(2)}</td>
+            {[
+              { label: '月營收(億)', fn: (r, i) => fmtN((Number(r.revenue)/100000)), cf: () => '#ccc' },
+              { label: '與上月營收成長(%)', fn: (r, i) => {
+                  const prev = mData[i+1];
+                  if (!prev || !Number(prev.revenue)) return null;
+                  return ((Number(r.revenue) - Number(prev.revenue)) / Math.abs(Number(prev.revenue)) * 100);
+                }, cf: colorPos },
+              { label: '營收年增率(%)', fn: (r, i) => {
+                  const py = mData.find(m => m.period === String(Number(r.period) - 100));
+                  if (!py || !Number(py.revenue)) return null;
+                  return ((Number(r.revenue) - Number(py.revenue)) / Math.abs(Number(py.revenue)) * 100);
+                }, cf: colorPos },
+              { label: '累計營收年增率(%)', fn: (r, i) => {
+                  const year = String(r.period).slice(0, 4);
+                  const month = Number(String(r.period).slice(4, 6));
+                  const cumCur = mData.filter(m => String(m.period).startsWith(year) && Number(String(m.period).slice(4,6)) <= month)
+                    .reduce((s, m) => s + Number(m.revenue), 0);
+                  const prevYear = String(Number(year) - 1);
+                  const cumPrev = mData.filter(m => String(m.period).startsWith(prevYear) && Number(String(m.period).slice(4,6)) <= month)
+                    .reduce((s, m) => s + Number(m.revenue), 0);
+                  if (!cumPrev) return null;
+                  return ((cumCur - cumPrev) / Math.abs(cumPrev) * 100);
+                }, cf: colorPos },
+              { label: '近3個月累計營收年增率(%)', fn: (r, i) => {
+                  const cur3 = mData.slice(i, i+3).reduce((s, m) => s + Number(m.revenue), 0);
+                  const periods3 = mData.slice(i, i+3).map(m => String(Number(m.period) - 100));
+                  const prev3 = mData.filter(m => periods3.includes(m.period)).reduce((s, m) => s + Number(m.revenue), 0);
+                  if (!prev3 || mData.slice(i,i+3).length < 3) return null;
+                  return ((cur3 - prev3) / Math.abs(prev3) * 100);
+                }, cf: colorPos },
+              { label: '近12個月累計營收年增率(%)', fn: (r, i) => {
+                  if (i + 12 > mData.length) return null;
+                  const cur12 = mData.slice(i, i+12).reduce((s, m) => s + Number(m.revenue), 0);
+                  const periods12 = mData.slice(i, i+12).map(m => String(Number(m.period) - 100));
+                  const prev12 = mData.filter(m => periods12.includes(m.period)).reduce((s, m) => s + Number(m.revenue), 0);
+                  if (!prev12) return null;
+                  return ((cur12 - prev12) / Math.abs(prev12) * 100);
+                }, cf: colorPos },
+            ].map((row, ri) => (
+              <tr key={row.label} style={{ background: ri % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                {mData.map((r, i) => {
+                  const val = row.fn(r, i);
+                  const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
+                  return <td key={r.period} style={{ ...td, color: val == null ? '#666' : row.cf(val) }}>{display}</td>;
+                })}
               </tr>
             ))}
           </tbody>
