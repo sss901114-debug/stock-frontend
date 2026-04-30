@@ -5,6 +5,7 @@ import StockOverview from './pages/StockOverview';
 import MarketRanking from './pages/MarketRanking';
 import Portfolio from './pages/Portfolio';
 import SectorComparison from './pages/SectorComparison';
+import Upload from './pages/Upload';
 import './App.css';
 
 const MAX_WATCHLIST = 30;
@@ -55,6 +56,7 @@ export default function App() {
             <NavLink to="/ranking">🏆 全市場排名</NavLink>
             <NavLink to="/sector">🔍 類股比較</NavLink>
             <NavLink to="/portfolio">★ 私房股</NavLink>
+            <NavLink to="/upload">📤 上傳資料</NavLink>
           </nav>
           <div className="page-content">
             <Routes>
@@ -62,6 +64,7 @@ export default function App() {
               <Route path="/ranking" element={<MarketRanking setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/sector" element={<SectorComparison setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/portfolio" element={<Portfolio setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} />} />
+              <Route path="/upload" element={<Upload />} />
             </Routes>
           </div>
         </main>
