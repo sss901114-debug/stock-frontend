@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-const API = process.env.REACT_APP_API_URL || 'https://stock-api-7u52.onrender.com';
+const API = process.env.REACT_APP_API_URL || 'https://stock-api-production-913a.up.railway.app';
 
 const FILE_TYPES = [
   { key: 'monthly', label: '📅 月報', desc: '格式：YYYYMM月報.xlsx，可一次選多檔', endpoint: '/api/upload/monthly', accept: '.xlsx' },
