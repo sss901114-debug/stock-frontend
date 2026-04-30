@@ -206,28 +206,26 @@ export default function StockOverview({ ticker }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
-              <th style={{ ...th, textAlign: 'left' }}>年度</th>
-              <th style={th}>營收(億)</th>
-              <th style={th}>毛利(億)</th>
-              <th style={th}>營業利益(億)</th>
-              <th style={th}>稅後淨利(億)</th>
-              <th style={th}>EPS</th>
-              <th style={th}>營業CF(億)</th>
-              <th style={th}>自由CF(億)</th>
+            <tr style={{ background: '#1e2a3a' }}>
+              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
+              {[...annual].reverse().map(r => <th key={r.year} style={th}>{r.year}</th>)}
             </tr>
           </thead>
           <tbody>
-            {[...annual].reverse().map((r, i) => (
-              <tr key={r.year} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518' }}>{r.year}</td>
-                <td style={{ ...td, color: '#ccc' }}>{fmt(r.revenue)}</td>
-                <td style={{ ...td, color: colorPos(r.gross_profit) }}>{fmt(r.gross_profit)}</td>
-                <td style={{ ...td, color: colorPos(r.op_income) }}>{fmt(r.op_income)}</td>
-                <td style={{ ...td, color: colorPos(r.net_income) }}>{fmt(r.net_income)}</td>
-                <td style={{ ...td, color: colorPos(r.eps) }}>{fmt(r.eps)}</td>
-                <td style={{ ...td, color: colorPos(r.op_cashflow) }}>{fmt(r.op_cashflow)}</td>
-                <td style={{ ...td, color: colorPos(r.free_cashflow) }}>{fmt(r.free_cashflow)}</td>
+            {[
+              { label: '營收(億)', key: 'revenue', cf: () => '#ccc' },
+              { label: '毛利(億)', key: 'gross_profit', cf: colorPos },
+              { label: '營業利益(億)', key: 'op_income', cf: colorPos },
+              { label: '稅後淨利(億)', key: 'net_income', cf: colorPos },
+              { label: 'EPS', key: 'eps', cf: colorPos },
+              { label: '營業CF(億)', key: 'op_cashflow', cf: colorPos },
+              { label: '自由CF(億)', key: 'free_cashflow', cf: colorPos },
+            ].map((row, i) => (
+              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                {[...annual].reverse().map(r => (
+                  <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -239,20 +237,22 @@ export default function StockOverview({ ticker }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a', color: '#ddd' }}>
-              <th style={{ ...th, textAlign: 'left' }}>年度</th>
-              <th style={th}>現金股利</th>
-              <th style={th}>EPS</th>
-              <th style={th}>發放率(%)</th>
+            <tr style={{ background: '#1e2a3a' }}>
+              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
+              {dividend.map(r => <th key={r.year} style={th}>{r.year}</th>)}
             </tr>
           </thead>
           <tbody>
-            {dividend.map((r, i) => (
-              <tr key={r.year} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518' }}>{r.year}</td>
-                <td style={{ ...td, color: colorPos(r.cash_dividend) }}>{fmt(r.cash_dividend)}</td>
-                <td style={{ ...td, color: colorPos(r.eps_prev_year) }}>{fmt(r.eps_prev_year)}</td>
-                <td style={{ ...td, color: '#ccc' }}>{fmt(r.payout_ratio_pct)}</td>
+            {[
+              { label: '現金股利', key: 'cash_dividend', cf: colorPos },
+              { label: 'EPS', key: 'eps_prev_year', cf: colorPos },
+              { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
+            ].map((row, i) => (
+              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                {dividend.map(r => (
+                  <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
+                ))}
               </tr>
             ))}
           </tbody>
