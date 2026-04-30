@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { getCompanies } from '../api';
 import './Sidebar.css';
 
-export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchlist }) {
+export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchlist, onLogoClick }) {
   const [companies, setCompanies] = useState([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
@@ -22,7 +22,7 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-header">
+      <div className="sidebar-header" onClick={onLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>
         <span className="sidebar-logo">📈</span>
         <span className="sidebar-title">台股分析</span>
       </div>

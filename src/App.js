@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import StockOverview from './pages/StockOverview';
@@ -9,6 +9,7 @@ import Upload from './pages/Upload';
 import './App.css';
 
 const MAX_WATCHLIST = 30;
+const SECRET_CLICKS = 5;
 
 function loadWatchlist() {
   try { return JSON.parse(localStorage.getItem('watchlist') || '[]'); } catch { return []; }
@@ -20,6 +21,23 @@ function saveWatchlist(list) {
 export default function App() {
   const [ticker, setTicker] = useState('2330');
   const [watchlist, setWatchlist] = useState(loadWatchlist);
+  const [showUpload, setShowUpload] = useState(false);
+  const clickCount = useRef(0);
+  const clickTimer = useRef(null);
+
+  const handleLogoClick = useCallback(() => {
+    clickCount.current += 1;
+    if (clickTimer.current) clearTimeout(clickTimer.current);
+    if (clickCount.current >= SECRET_CLICKS) {
+      setShowUpload(prev => {
+        const next = !prev;
+        return next;
+      });
+      clickCount.current = 0;
+    } else {
+      clickTimer.current = setTimeout(() => { clickCount.current = 0; }, 2000);
+    }
+  }, []);
 
   const addToWatchlist = useCallback((ticker, name) => {
     setWatchlist(prev => {
@@ -49,14 +67,14 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
-        <Sidebar ticker={ticker} setTicker={setTicker} watchlist={watchlist} removeFromWatchlist={removeFromWatchlist} />
+        <Sidebar ticker={ticker} setTicker={setTicker} watchlist={watchlist} removeFromWatchlist={removeFromWatchlist} onLogoClick={handleLogoClick} />
         <main className="main-content">
           <nav className="top-nav">
             <NavLink to="/" end>📊 個股總覽</NavLink>
             <NavLink to="/ranking">🏆 全市場排名</NavLink>
             <NavLink to="/sector">🔍 類股比較</NavLink>
             <NavLink to="/portfolio">★ 私房股</NavLink>
-            <NavLink to="/upload">📤 上傳資料</NavLink>
+            {showUpload && <NavLink to="/upload">📤 上傳資料</NavLink>}
           </nav>
           <div className="page-content">
             <Routes>
