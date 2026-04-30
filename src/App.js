@@ -7,7 +7,7 @@ import Portfolio from './pages/Portfolio';
 import SectorComparison from './pages/SectorComparison';
 import './App.css';
 
-const MAX_WATCHLIST = 10;
+const MAX_WATCHLIST = 30;
 
 function loadWatchlist() {
   try { return JSON.parse(localStorage.getItem('watchlist') || '[]'); } catch { return []; }

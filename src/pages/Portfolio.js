@@ -55,7 +55,7 @@ export default function Portfolio({ setTicker, watchlist, addToWatchlist, remove
       </div>
 
       <div className="card">
-        <div className="section-title">📋 目前私房股（{watchlist.length}/10）</div>
+        <div className="section-title">📋 目前私房股（{watchlist.length}/30）</div>
         {watchlist.length === 0
           ? <div style={{ color: '#888', padding: '20px 0' }}>尚無個股，請用上方搜尋或在排名頁面勾選加入</div>
           : <table>
