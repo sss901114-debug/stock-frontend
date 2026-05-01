@@ -65,17 +65,17 @@ export default function StockOverview({ ticker }) {
       {/* 標題 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#4ec94e', marginBottom: 4 }}>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1a7a3a', marginBottom: 4 }}>
             {ticker} {info.name}
-            {closePrice && <span style={{ fontSize: 18, color: '#fff', marginLeft: 16, fontWeight: 400 }}>
-              收盤 <b style={{ color: '#f5c842' }}>{closePrice.close}</b>
-              <span style={{ fontSize: 12, color: '#aaa', marginLeft: 8 }}>{closePrice.date}</span>
+            {closePrice && <span style={{ fontSize: 18, color: '#c8a200', marginLeft: 16, fontWeight: 400 }}>
+              收盤價 <b style={{ color: '#b8860b' }}>{closePrice.close}</b>
+              <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>{closePrice.date}</span>
             </span>}
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
         </div>
         <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
-          style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: '#fff', cursor: 'pointer', fontWeight: 600 }}>
+          style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: inWatchlist ? '#fff' : '#4C9BB8', cursor: 'pointer', fontWeight: 600 }}>
           {inWatchlist ? '★ 已追蹤' : '☆ 加入追蹤'}
         </button>
       </div>
