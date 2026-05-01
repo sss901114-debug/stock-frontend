@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { getCompanyInfo, getQuarterly, getMonthly, getAnnual, getDividend, getEstEps, addWatchlist, removeWatchlist } from '../api';
 
+const API_URL = 'https://stock-api-production-913a.up.railway.app';
+
 export default function StockOverview({ ticker }) {
   const [info, setInfo] = useState(null);
   const [quarterly, setQuarterly] = useState([]);
@@ -10,10 +12,12 @@ export default function StockOverview({ ticker }) {
   const [estEps, setEstEps] = useState(null);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [closePrice, setClosePrice] = useState(null);
 
   useEffect(() => {
     if (!ticker) return;
     setLoading(true);
+    setClosePrice(null);
     Promise.all([
       getCompanyInfo(ticker).catch(() => null),
       getQuarterly(ticker).catch(() => []),
@@ -26,6 +30,10 @@ export default function StockOverview({ ticker }) {
       setAnnual(a); setDividend(d); setEstEps(e);
       setLoading(false);
     });
+    fetch(`${API_URL}/api/company/${ticker}/close-price`)
+      .then(r => r.json())
+      .then(d => { if (d.close) setClosePrice(d); })
+      .catch(() => {});
   }, [ticker]);
 
   if (!ticker) return (
@@ -57,7 +65,13 @@ export default function StockOverview({ ticker }) {
       {/* 標題 */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
         <div>
-          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#fff', marginBottom: 4 }}>{ticker} {info.name}</h2>
+          <h2 style={{ fontSize: 24, fontWeight: 700, color: '#4ec94e', marginBottom: 4 }}>
+            {ticker} {info.name}
+            {closePrice && <span style={{ fontSize: 18, color: '#fff', marginLeft: 16, fontWeight: 400 }}>
+              收盤 <b style={{ color: '#f5c842' }}>{closePrice.close}</b>
+              <span style={{ fontSize: 12, color: '#aaa', marginLeft: 8 }}>{closePrice.date}</span>
+            </span>}
+          </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
         </div>
         <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
