@@ -91,7 +91,7 @@ export default function StockOverview({ ticker }) {
       )}
 
       {/* 季度損益表 */}
-      {sectionTitle('📊 季度損益表')}
+      {sectionTitle('📊 季度損益表（單位：億）')}
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
@@ -104,14 +104,15 @@ export default function StockOverview({ ticker }) {
             {[
               { label: '營業收入(億)', key: '營業收入_億', cf: colorPos },
               { label: '毛利率(%)', key: '毛利率', cf: colorPos },
+              { label: '推銷費用率(%)', key: '推銷費用率', cf: colorNeg },
+              { label: '管理費用率(%)', key: '管理費用率', cf: colorNeg },
+              { label: '研發費用率(%)', key: '研發費用率', cf: colorNeg },
+              { label: '營業費用率(%)', key: '營業費用率', cf: colorNeg },
               { label: '營益率(%)', key: '營益率', cf: colorPos },
               { label: '業外收支率(%)', key: '業外收支率', cf: colorPos },
               { label: '稅前淨利率(%)', key: '稅前淨利率', cf: colorPos },
               { label: '稅後淨利率(%)', key: '稅後淨利率', cf: colorPos },
               { label: '每股盈餘(元)', key: '每股盈餘', cf: colorPos },
-              { label: '推銷費用率(%)', key: '推銷費用率', cf: colorNeg },
-              { label: '管理費用率(%)', key: '管理費用率', cf: colorNeg },
-              { label: '研發費用率(%)', key: '研發費用率', cf: colorNeg },
               { label: '營收年增率(%)', key: '營收年增率', cf: colorPos },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
@@ -124,7 +125,7 @@ export default function StockOverview({ ticker }) {
       </div>
 
       {/* 季度資產負債表 */}
-      {sectionTitle('🏦 季度資產負債表')}
+      {sectionTitle('🏦 季度資產負債表（單位：億）')}
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
@@ -135,17 +136,82 @@ export default function StockOverview({ ticker }) {
           </thead>
           <tbody>
             {[
-              { label: '資產總額(億)', key: '資產總額_億', cf: colorPos },
-              { label: '負債總額(億)', key: '負債總額_億', cf: colorNeg },
-              { label: '股東權益(億)', key: '股東權益_億', cf: colorPos },
-              { label: '現金(億)', key: '現金_億', cf: colorPos },
+              { label: '約當現金(億)', key: '現金_億', cf: colorPos },
+              { label: '應收帳款(億)', key: '應收帳款_億', cf: () => '#ccc' },
               { label: '存貨(億)', key: '存貨_億', cf: () => '#ccc' },
+              { label: '採權益法長期投資(億)', key: '採權益法投資_億', cf: () => '#ccc' },
+              { label: '不動產機器設備(億)', key: '不動產廠房設備_億', cf: () => '#ccc' },
+              { label: '資產總額(億)', key: '資產總額_億', cf: colorPos },
+              { label: '短期借款(億)', key: '短期借款_億', cf: colorNeg },
+              { label: '應付帳款(億)', key: '應付帳款_億', cf: () => '#ccc' },
+              { label: '負債總額(億)', key: '負債總額_億', cf: colorNeg },
+              { label: '股本(億)', key: '股本_億', cf: () => '#ccc' },
+              { label: '母公司股東權益(億)', key: '股東權益_億', cf: colorPos },
               { label: '每股淨值', key: '每股淨值', cf: colorPos },
               { label: '負債比率(%)', key: '負債比率', cf: colorNeg },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
                 <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
                 {qData.map(q => <td key={q['期別']} style={{ ...td, color: row.cf(q[row.key]) }}>{fmt(q[row.key])}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 季度現金流量表 */}
+      {sectionTitle('💵 季度現金流量表（單位：億）')}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: '#1e2a3a' }}>
+              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
+              {qHeaders.map(h => <th key={h} style={th}>{h}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { label: '稅前淨利(億)', key: '稅前淨利_億', cf: colorPos },
+              { label: '營業活動現金流入(出)(億)', key: '營業CF_億', cf: colorPos },
+              { label: '投資活動現金流入(出)(億)', key: '投資CF_億', cf: () => '#ccc' },
+              { label: '籌資活動現金流入(出)(億)', key: '籌資CF_億', cf: () => '#ccc' },
+              { label: '自由現金流量(億)', key: '自由CF_億', cf: colorPos },
+              { label: '盈餘含金量(營業活動現金/稅前淨利%)', key: '盈餘含金量', cf: colorPos },
+            ].map((row, i) => (
+              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                {qData.map(q => <td key={q['期別']} style={{ ...td, color: row.cf(q[row.key]) }}>{fmt(q[row.key])}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* 年度財務 */}
+      {sectionTitle('📈 年度財務')}
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: '#1e2a3a' }}>
+              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
+              {[...annual].reverse().map(r => <th key={r.year} style={th}>{r.year}</th>)}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              { label: '營收(億)', key: 'revenue', cf: () => '#ccc' },
+              { label: '毛利(億)', key: 'gross_profit', cf: colorPos },
+              { label: '營業利益(億)', key: 'op_income', cf: colorPos },
+              { label: '稅後淨利(億)', key: 'net_income', cf: colorPos },
+              { label: 'EPS', key: 'eps', cf: colorPos },
+              { label: '營業CF(億)', key: 'op_cashflow', cf: colorPos },
+              { label: '自由CF(億)', key: 'free_cashflow', cf: colorPos },
+            ].map((row, i) => (
+              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                {[...annual].reverse().map(r => (
+                  <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
+                ))}
               </tr>
             ))}
           </tbody>
@@ -178,37 +244,6 @@ export default function StockOverview({ ticker }) {
                   const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
                   return <td key={r.period} style={{ ...td, color: val == null ? '#666' : row.cf(val) }}>{display}</td>;
                 })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-
-      {/* 年度財務 */}
-      {sectionTitle('📈 年度財務')}
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-          <thead>
-            <tr style={{ background: '#1e2a3a' }}>
-              <th style={{ ...th, textAlign: 'left', minWidth: 160 }}>項目</th>
-              {[...annual].reverse().map(r => <th key={r.year} style={th}>{r.year}</th>)}
-            </tr>
-          </thead>
-          <tbody>
-            {[
-              { label: '營收(億)', key: 'revenue', cf: () => '#ccc' },
-              { label: '毛利(億)', key: 'gross_profit', cf: colorPos },
-              { label: '營業利益(億)', key: 'op_income', cf: colorPos },
-              { label: '稅後淨利(億)', key: 'net_income', cf: colorPos },
-              { label: 'EPS', key: 'eps', cf: colorPos },
-              { label: '營業CF(億)', key: 'op_cashflow', cf: colorPos },
-              { label: '自由CF(億)', key: 'free_cashflow', cf: colorPos },
-            ].map((row, i) => (
-              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
-                {[...annual].reverse().map(r => (
-                  <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
-                ))}
               </tr>
             ))}
           </tbody>
