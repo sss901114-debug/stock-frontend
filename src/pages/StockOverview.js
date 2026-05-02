@@ -73,10 +73,10 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {qData.map(q => {
                 const val = row.calc ? row.calc(q) : (row.key ? q[row.key] : null);
-                const sepStyle = row.sep ? { borderBottom: '2px solid #4C9BB8' } : {};
+                const sepStyle = row.sep ? { borderBottom: '2px solid #ffffff' } : {};
                 return (
                   <td key={q['期別']} style={{ ...td, ...sepStyle, color: row.cf ? row.cf(val) : '#555' }}>
                     {fmt(val)}
@@ -102,7 +102,7 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
                 return (
@@ -269,7 +269,7 @@ export default function StockOverview({ ticker }) {
               { label: '近12個月累計營收年增率(%)', fn: (r) => r.cum_12m_pct != null ? Number(r.cum_12m_pct) : null, cf: colorPos },
             ].map((row, ri) => (
               <tr key={row.label} style={{ background: ri % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {mData.map((r, i) => {
                   const val = row.fn(r, i);
                   const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
@@ -298,7 +298,7 @@ export default function StockOverview({ ticker }) {
               { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {dividend.map(r => (
                   <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
                 ))}
