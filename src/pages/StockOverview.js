@@ -138,9 +138,9 @@ export default function StockOverview({ ticker }) {
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
           {(info.business1 || info.product_mix) && (
-            <div style={{ color: '#4a7090', fontSize: 11, marginTop: 4, lineHeight: 1.7, maxWidth: 900 }}>
+            <div style={{ color: '#6a90aa', fontSize: 11, marginTop: 4, lineHeight: 1.7, maxWidth: 900 }}>
               {[info.business1, info.business2, info.business3].filter(Boolean).join('；')}
-              {info.product_mix && <span style={{ color: '#5a90b8', marginLeft: 6 }}>【{info.product_mix}】</span>}
+              {info.product_mix && <span style={{ color: '#7ab0d0', marginLeft: 6 }}>【{info.product_mix}】</span>}
             </div>
           )}
         </div>
@@ -178,7 +178,7 @@ export default function StockOverview({ ticker }) {
 
         const C = ({ label, value, color, big }) => (
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 12px', borderRight: '1px solid #0f1c2a', minWidth: 90 }}>
-            <span style={{ color: '#3a5870', fontSize: 9, marginBottom: 4, whiteSpace: 'nowrap', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: "'Rajdhani',sans-serif", fontWeight: 600 }}>{label}</span>
+            <span style={{ color: '#5a8090', fontSize: 9, marginBottom: 4, whiteSpace: 'nowrap', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: "'Rajdhani',sans-serif", fontWeight: 600 }}>{label}</span>
             <span style={{ color: color || '#8ab0cc', fontWeight: big ? 600 : 500, fontSize: big ? 16 : 14, whiteSpace: 'nowrap', fontFamily: "'JetBrains Mono',monospace" }}>{value ?? '-'}</span>
           </div>
         );
@@ -198,7 +198,7 @@ export default function StockOverview({ ticker }) {
             {/* 第二行：預估 */}
             {estEps && (
               <div style={{ display: 'flex', flexWrap: 'wrap', padding: '4px 0', background: '#060910' }}>
-                <div style={{ color: '#2a4060', fontSize: 9, padding: '8px 12px', display: 'flex', alignItems: 'center', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, letterSpacing: 2 }}>🔮 預估</div>
+                <div style={{ color: '#4a7090', fontSize: 9, padding: '8px 12px', display: 'flex', alignItems: 'center', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, letterSpacing: 2 }}>🔮 預估</div>
                 <C label="預估未來1季毛利率" value={estEps.est_gpm != null ? estEps.est_gpm+'%' : '-'} color="#7ec8e3" />
                 <C label="預估未來1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
                 <C label="預估未來1季EPS" value={estEps.est_eps ?? '-'} color="#c0e0f8" big />
@@ -214,7 +214,7 @@ export default function StockOverview({ ticker }) {
                   </>);
                 })()}
                 <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', flex: 1 }}>
-                  <span style={{ color: '#2a4260', fontSize: 9, lineHeight: 1.5 }}>
+                  <span style={{ color: '#5a80a0', fontSize: 9, lineHeight: 1.5 }}>
                     ⚠️ 本預估數據係依財務數據邏輯推演，僅供投資參考。<br/>預估結果不代表實際績效，投資人應審慎判斷，自負盈虧。
                   </span>
                 </div>
@@ -232,7 +232,7 @@ export default function StockOverview({ ticker }) {
           {aiLoading ? (
             <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
           ) : (
-            <div style={{ color: '#8ab0c8', fontSize: 13, lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
+            <div style={{ color: '#a0c0d8', fontSize: 13, lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
               {aiReport}
             </div>
           )}
@@ -275,7 +275,7 @@ export default function StockOverview({ ticker }) {
         }));
 
         const chartStyle = { background: '#080b10', padding: '10px', marginBottom: 1 };
-        const chartTitle = (t) => <div style={{ color: '#3a6080', fontWeight: 600, fontSize: 9, marginBottom: 6, paddingLeft: 4, letterSpacing: '2.5px', fontFamily: "'Rajdhani',sans-serif", display:'flex', alignItems:'center', gap:6 }}><span style={{display:'inline-block',width:14,height:1,background:'linear-gradient(90deg,#80b0d0,transparent)'}}></span>{t.toUpperCase()}</div>;
+        const chartTitle = (t) => <div style={{ color: '#5a8aaa', fontWeight: 600, fontSize: 9, marginBottom: 6, paddingLeft: 4, letterSpacing: '2.5px', fontFamily: "'Rajdhani',sans-serif", display:'flex', alignItems:'center', gap:6 }}><span style={{display:'inline-block',width:14,height:1,background:'linear-gradient(90deg,#80b0d0,transparent)'}}></span>{t.toUpperCase()}</div>;
         const TT = ({ active, payload, label }) => active && payload?.length ? (
           <div style={{ background: '#0d1828', border: '1px solid #1e3040', borderRadius: 0, padding: '8px 12px', fontSize: 12 }}>
             <div style={{ color: '#90c0dc', marginBottom: 4, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1 }}>{label}</div>
@@ -435,11 +435,11 @@ export default function StockOverview({ ticker }) {
                   <span style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13 }}>📅 </span>
                   <span style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13 }}>月營收 </span>
                   {rev0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#ddd' }}>{rev0}億 </span><span style={{ color: revColor, fontWeight: 700 }}>{revArrow}</span></span>}
-                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 年增率 </span>
+                  <span style={{ color: '#6a90aa', fontSize: 12 }}> ｜ 年增率 </span>
                   {yoy0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#f5c518' }}>{yoy0}% </span><span style={{ color: yoyColor, fontWeight: 700 }}>{yoyArrow}</span></span>}
-                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 近3月 </span>
+                  <span style={{ color: '#6a90aa', fontSize: 12 }}> ｜ 近3月 </span>
                   {c3m0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#4ec94e' }}>{c3m0}% </span><span style={{ color: c3mColor, fontWeight: 700 }}>{c3mArrow}</span></span>}
-                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 近12月 </span>
+                  <span style={{ color: '#6a90aa', fontSize: 12 }}> ｜ 近12月 </span>
                   {c12m0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#ff7f50' }}>{c12m0}% </span><span style={{ color: c12mColor, fontWeight: 700 }}>{c12mArrow}</span></span>}
                 </div>
             <ResponsiveContainer width="100%" height={220}>
