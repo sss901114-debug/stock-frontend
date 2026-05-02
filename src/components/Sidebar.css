@@ -64,9 +64,10 @@
 .search-box input {
   width: 100%;
   background: #060910;
-  border: 1px solid #1a2a3c;
+  border: 1px solid #3a6080;
   padding: 6px 10px;
   color: #6a90b0;
+  box-shadow: 0 0 0 1px #1e3a52 inset;
   font-size: 11px;
   outline: none;
   font-family: var(--font-mono);
