@@ -20,11 +20,22 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
     ).slice(0, 8));
   }, [search, companies]);
 
+  // Enter 鍵直接選第一筆，或精確比對代號
+  const handleKeyDown = (e) => {
+    if (e.key !== 'Enter') return;
+    const exact = companies.find(c => c.ticker === search.trim());
+    const target = exact || results[0];
+    if (target) { setTicker(target.ticker); setSearch(''); setResults([]); }
+  };
+
   return (
     <aside className="sidebar">
       <div className="sidebar-header" onClick={onLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>
         <span className="sidebar-logo">📈</span>
-        <span className="sidebar-title">台股分析</span>
+        <span className="sidebar-title" style={{ lineHeight: 1.3, fontSize: 13 }}>
+          AI WINTIME<br/>
+          <span style={{ fontSize: 11, color: '#7abcd4' }}>台股財務健診系統</span>
+        </span>
       </div>
 
       <div className="sidebar-section">
@@ -33,6 +44,7 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder="代號或名稱..."
           />
           {results.length > 0 && (
@@ -47,9 +59,14 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
             </div>
           )}
         </div>
-        <div className="current-stock">
-          {companies.find(c => c.ticker === ticker)?.name || ticker}
-          <span className="current-ticker">{ticker}</span>
+        {/* 目前股票做成可點擊按鈕 */}
+        <div className="current-stock" onClick={() => setTicker(ticker)}
+          style={{ cursor: 'pointer', borderRadius: 6, padding: '6px 10px',
+            background: '#1e3a5a', border: '1px solid #4C9BB8', marginTop: 4,
+            display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span>{companies.find(c => c.ticker === ticker)?.name || ticker}</span>
+          <span className="current-ticker" style={{ background: '#4C9BB8', color: '#fff',
+            padding: '2px 7px', borderRadius: 4, fontSize: 12 }}>{ticker}</span>
         </div>
       </div>
 
