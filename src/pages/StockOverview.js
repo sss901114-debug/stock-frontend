@@ -14,7 +14,6 @@ export default function StockOverview({ ticker }) {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [closePrice, setClosePrice] = useState(null);
-  const [brief, setBrief] = useState('');
   const [aiReport, setAiReport] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
 
@@ -23,7 +22,6 @@ export default function StockOverview({ ticker }) {
     setLoading(true);
     setClosePrice(null);
     setAiReport('');
-    setBrief('');
     Promise.all([
       getCompanyInfo(ticker).catch(() => null),
       getQuarterly(ticker).catch(() => []),
@@ -40,10 +38,7 @@ export default function StockOverview({ ticker }) {
       .then(r => r.json())
       .then(d => { if (d.close) setClosePrice(d); })
       .catch(() => {});
-    fetch(`${API_URL}/api/company/${ticker}/brief`)
-      .then(r => r.json())
-      .then(d => { if (d.brief) setBrief(d.brief); })
-      .catch(() => {});
+
   }, [ticker]);
 
   if (!ticker) return (
@@ -142,7 +137,12 @@ export default function StockOverview({ ticker }) {
             </span>}
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
-          {brief && <span style={{ color: '#999', fontSize: 12, marginTop: 4, display: 'block', maxWidth: 800, lineHeight: 1.6 }}>{brief}</span>}
+          {(info.business1 || info.product_mix) && (
+            <div style={{ color: '#999', fontSize: 12, marginTop: 4, lineHeight: 1.6, maxWidth: 900 }}>
+              {[info.business1, info.business2, info.business3].filter(Boolean).join('；')}
+              {info.product_mix && <span style={{ color: '#7a9ab8', marginLeft: 6 }}>【{info.product_mix}】</span>}
+            </div>
+          )}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={async () => {
