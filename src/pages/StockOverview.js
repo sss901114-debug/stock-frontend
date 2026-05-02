@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { ComposedChart, Bar, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { getCompanyInfo, getQuarterly, getMonthly, getAnnual, getDividend, getEstEps, addWatchlist, removeWatchlist } from '../api';
 
 const API_URL = 'https://stock-api-production-913a.up.railway.app';
@@ -148,6 +149,98 @@ export default function StockOverview({ ticker }) {
           <span style={{ color: '#fff' }}>預估EPS：<b style={{ color: '#f5c518', fontSize: 18 }}>{estEps.est_eps ?? 'N/A'}</b></span>
         </div>
       )}
+
+
+      {/* ── 圖表區 ── */}
+      {qData.length > 0 && (() => {
+        // 圖表資料：由舊到新
+        const chartData = [...qData].reverse().map(q => ({
+          期別: q['期別'],
+          營業收入: q['營業收入_億'],
+          毛利率: q['毛利率'],
+          營益率: q['營益率'],
+          稅前淨利率: q['稅前淨利率'],
+          推銷費用率: q['推銷費用率'],
+          管理費用率: q['管理費用率'],
+          研發費用率: q['研發費用率'],
+          不透明資產: (() => {
+            const a = q['備供出售流動_億'] || 0;
+            const b = q['備供出售非流動_億'] || 0;
+            const c = q['採權益法投資_億'] || 0;
+            const d = q['無形資產_億'] || 0;
+            return +(a+b+c+d).toFixed(2);
+          })(),
+          財務透明度: q['財務透明度'],
+        }));
+
+        const chartStyle = { background: '#151f2e', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
+        const chartTitle = (t) => <div style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13, marginBottom: 8, paddingLeft: 8 }}>{t}</div>;
+        const TT = ({ active, payload, label }) => active && payload?.length ? (
+          <div style={{ background: '#1e2a3a', border: '1px solid #2a3a4a', borderRadius: 6, padding: '8px 12px', fontSize: 12 }}>
+            <div style={{ color: '#f5c518', marginBottom: 4 }}>{label}</div>
+            {payload.map((p, i) => <div key={i} style={{ color: p.color }}>{p.name}: {p.value != null ? p.value.toFixed(2) : '-'}</div>)}
+          </div>
+        ) : null;
+
+        return (
+          <div style={{ marginBottom: 8 }}>
+            {/* 圖1：營業收入 + 利潤率 */}
+            <div style={chartStyle}>
+              {chartTitle('📊 營業收入（億）vs 獲利能力（%）')}
+              <ResponsiveContainer width="100%" height={220}>
+                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" />
+                  <Tooltip content={<TT />} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
+                  <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
+                  <Line yAxisId="right" type="monotone" dataKey="毛利率" stroke="#4ec94e" strokeWidth={2} dot={false} name="毛利率%" />
+                  <Line yAxisId="right" type="monotone" dataKey="營益率" stroke="#f5c518" strokeWidth={2} dot={false} name="營益率%" />
+                  <Line yAxisId="right" type="monotone" dataKey="稅前淨利率" stroke="#ff7f50" strokeWidth={2} dot={false} name="稅前淨利率%" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 圖2：營業收入 + 費用率 */}
+            <div style={chartStyle}>
+              {chartTitle('📊 營業收入（億）vs 費用率（%）')}
+              <ResponsiveContainer width="100%" height={220}>
+                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" />
+                  <Tooltip content={<TT />} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
+                  <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
+                  <Line yAxisId="right" type="monotone" dataKey="推銷費用率" stroke="#e05c5c" strokeWidth={2} dot={false} name="推銷費用率%" />
+                  <Line yAxisId="right" type="monotone" dataKey="管理費用率" stroke="#ff9f40" strokeWidth={2} dot={false} name="管理費用率%" />
+                  <Line yAxisId="right" type="monotone" dataKey="研發費用率" stroke="#b87fdb" strokeWidth={2} dot={false} name="研發費用率%" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* 圖3：不透明資產 + 財務透明度 */}
+            <div style={chartStyle}>
+              {chartTitle('📊 不透明資產合計（億）vs 財務透明度（%）')}
+              <ResponsiveContainer width="100%" height={220}>
+                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
+                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" domain={[0, 100]} />
+                  <Tooltip content={<TT />} />
+                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
+                  <Bar yAxisId="left" dataKey="不透明資產" fill="#e05c5c" opacity={0.8} name="不透明資產合計(億)" />
+                  <Line yAxisId="right" type="monotone" dataKey="財務透明度" stroke="#4ec94e" strokeWidth={2} dot={false} name="財務透明度%" />
+                </ComposedChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── 季度損益表 (圖2) ── */}
       {sectionTitle('📊 季度損益表（單位：億 / %）')}
