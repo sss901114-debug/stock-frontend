@@ -138,9 +138,9 @@ export default function StockOverview({ ticker }) {
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
           {(info.business1 || info.product_mix) && (
-            <div style={{ color: '#999', fontSize: 12, marginTop: 4, lineHeight: 1.6, maxWidth: 900 }}>
+            <div style={{ color: '#bbb', fontSize: 12, marginTop: 4, lineHeight: 1.6, maxWidth: 900 }}>
               {[info.business1, info.business2, info.business3].filter(Boolean).join('；')}
-              {info.product_mix && <span style={{ color: '#7a9ab8', marginLeft: 6 }}>【{info.product_mix}】</span>}
+              {info.product_mix && <span style={{ color: '#90c8e8', marginLeft: 6 }}>【{info.product_mix}】</span>}
             </div>
           )}
         </div>
@@ -156,7 +156,7 @@ export default function StockOverview({ ticker }) {
             }}
             disabled={aiLoading}
             style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #f5c518', background: aiLoading ? '#555' : '#2a1f00', color: '#f5c518', cursor: aiLoading ? 'default' : 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
-            {aiLoading ? '⏳ 分析中...' : '🤖 AI 財務分析'}
+            {aiLoading ? '⏳ 健診中...' : '🤖 AI個股財務健診'}
           </button>
           <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
             style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: inWatchlist ? '#fff' : '#4C9BB8', cursor: 'pointer', fontWeight: 600 }}>
@@ -203,6 +203,16 @@ export default function StockOverview({ ticker }) {
                 <C label="預估未來1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
                 <C label="預估未來1季EPS" value={estEps.est_eps ?? '-'} color="#f5c518" big />
                 <C label="預估未來4季EPS" value={estEps.est_eps_4q ?? '-'} color="#f5c518" big />
+                {(() => {
+                  const eps3q = qData.slice(1,4).reduce((s,q) => s+(Number(q['每股盈餘'])||0), 0);
+                  const base1q = eps3q + (estEps.est_eps || 0);
+                  const pe1q = (cp && base1q > 0) ? (cp/base1q).toFixed(1)+'x' : '-';
+                  const pe4q = (cp && estEps.est_eps_4q > 0) ? (cp/estEps.est_eps_4q).toFixed(1)+'x' : '-';
+                  return (<>
+                    <C label="預估未來1季本益比" value={pe1q} color="#c8a200" />
+                    <C label="預估未來4季本益比" value={pe4q} color="#c8a200" />
+                  </>);
+                })()}
                 <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', flex: 1 }}>
                   <span style={{ color: '#666', fontSize: 10, lineHeight: 1.5 }}>
                     ⚠️ 本預估數據係依財務數據邏輯推演，僅供投資參考。<br/>預估結果不代表實際績效，投資人應審慎判斷，自負盈虧。
@@ -218,7 +228,7 @@ export default function StockOverview({ ticker }) {
       {/* ── AI 分析報告 ── */}
       {(aiReport || aiLoading) && (
         <div style={{ background: '#111a27', border: '1px solid #2a3a4a', borderRadius: 10, padding: '20px 24px', marginBottom: 16 }}>
-          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🤖 AI 財務分析報告</div>
+          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🤖 AI個股財務健診報告</div>
           {aiLoading ? (
             <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
           ) : (
