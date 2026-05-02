@@ -14,11 +14,14 @@ export default function StockOverview({ ticker }) {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [closePrice, setClosePrice] = useState(null);
+  const [aiReport, setAiReport] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     if (!ticker) return;
     setLoading(true);
     setClosePrice(null);
+    setAiReport('');
     Promise.all([
       getCompanyInfo(ticker).catch(() => null),
       getQuarterly(ticker).catch(() => []),
@@ -134,10 +137,25 @@ export default function StockOverview({ ticker }) {
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
         </div>
-        <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
-          style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: inWatchlist ? '#fff' : '#4C9BB8', cursor: 'pointer', fontWeight: 600 }}>
-          {inWatchlist ? '★ 已追蹤' : '☆ 加入追蹤'}
-        </button>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button onClick={async () => {
+              setAiLoading(true); setAiReport('');
+              try {
+                const res = await fetch(`${API_URL}/api/company/${ticker}/analysis`, { method: 'POST' });
+                const data = await res.json();
+                setAiReport(data.ok ? data.report : ('錯誤：' + data.error));
+              } catch(e) { setAiReport('連線失敗：' + e.message); }
+              setAiLoading(false);
+            }}
+            disabled={aiLoading}
+            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #f5c518', background: aiLoading ? '#555' : '#2a1f00', color: '#f5c518', cursor: aiLoading ? 'default' : 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+            {aiLoading ? '⏳ 分析中...' : '🤖 AI 財務分析'}
+          </button>
+          <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
+            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: inWatchlist ? '#fff' : '#4C9BB8', cursor: 'pointer', fontWeight: 600 }}>
+            {inWatchlist ? '★ 已追蹤' : '☆ 加入追蹤'}
+          </button>
+        </div>
       </div>
 
       {/* 預估EPS */}
@@ -150,6 +168,26 @@ export default function StockOverview({ ticker }) {
         </div>
       )}
 
+
+      {/* ── AI 分析報告 ── */}
+      {(aiReport || aiLoading) && (
+        <div style={{ background: '#111a27', border: '1px solid #2a3a4a', borderRadius: 10, padding: '20px 24px', marginBottom: 16 }}>
+          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🤖 AI 財務分析報告</div>
+          {aiLoading ? (
+            <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
+          ) : (
+            <div style={{ color: '#ddd', fontSize: 14, lineHeight: 1.85, whiteSpace: 'pre-wrap' }}>
+              {aiReport}
+            </div>
+          )}
+          {!aiLoading && aiReport && (
+            <button onClick={() => setAiReport('')}
+              style={{ marginTop: 12, padding: '4px 14px', borderRadius: 6, border: '1px solid #555', background: 'transparent', color: '#888', cursor: 'pointer', fontSize: 12 }}>
+              ✕ 關閉報告
+            </button>
+          )}
+        </div>
+      )}
 
       {/* ── 圖表區 ── */}
       {qData.length > 0 && (() => {
