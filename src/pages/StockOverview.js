@@ -255,6 +255,13 @@ export default function StockOverview({ ticker }) {
             return +(a+b+c+d).toFixed(2);
           })(),
           財務透明度: q['財務透明度'],
+          稅前淨利億: q['稅前淨利_億'] ?? null,
+          營業CF億: q['營業CF_億'] ?? null,
+          餘絀CF億: q['餘絀CF_億'] ?? null,
+          有息負債億: q['有息負債_億'] ?? null,
+          存貨億: q['存貨_億'] ?? null,
+          不動產設備億: q['不動產廠房設備_億'] ?? null,
+          無形資產億: q['無形資產_億'] ?? null,
         }));
 
         const chartStyle = { background: '#151f2e', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
@@ -385,8 +392,27 @@ export default function StockOverview({ ticker }) {
           近3月累計年增率: r.cum_3m_pct != null ? +Number(r.cum_3m_pct).toFixed(1) : null,
           近12月累計年增率: r.cum_12m_pct != null ? +Number(r.cum_12m_pct).toFixed(1) : null,
         }));
+
+        // 月營收標題含最新數值和環比箭頭
+        const m0 = mData[0] || {}, m1 = mData[1] || {};
+        const rev0 = m0.revenue ? +(m0.revenue/100000).toFixed(2) : null;
+        const rev1 = m1.revenue ? +(m1.revenue/100000).toFixed(2) : null;
+        const revArrow = (rev0 && rev1) ? (rev0 > rev1 ? '▲' : rev0 < rev1 ? '▼' : '─') : '';
+        const revColor = revArrow === '▲' ? '#4ec94e' : revArrow === '▼' ? '#e05c5c' : '#888';
+        const yoy0 = m0.yoy_pct != null ? +Number(m0.yoy_pct).toFixed(1) : null;
+        const yoy1 = m1.yoy_pct != null ? +Number(m1.yoy_pct).toFixed(1) : null;
+        const yoyArrow = (yoy0 != null && yoy1 != null) ? (yoy0 > yoy1 ? '▲' : yoy0 < yoy1 ? '▼' : '─') : '';
+        const yoyColor = yoyArrow === '▲' ? '#4ec94e' : yoyArrow === '▼' ? '#e05c5c' : '#888';
+        const c3m0 = m0.cum_3m_pct != null ? +Number(m0.cum_3m_pct).toFixed(1) : null;
+        const c3m1 = m1.cum_3m_pct != null ? +Number(m1.cum_3m_pct).toFixed(1) : null;
+        const c3mArrow = (c3m0 != null && c3m1 != null) ? (c3m0 > c3m1 ? '▲' : c3m0 < c3m1 ? '▼' : '─') : '';
+        const c3mColor = c3mArrow === '▲' ? '#4ec94e' : c3mArrow === '▼' ? '#e05c5c' : '#888';
+        const c12m0 = m0.cum_12m_pct != null ? +Number(m0.cum_12m_pct).toFixed(1) : null;
+        const c12m1 = m1.cum_12m_pct != null ? +Number(m1.cum_12m_pct).toFixed(1) : null;
+        const c12mArrow = (c12m0 != null && c12m1 != null) ? (c12m0 > c12m1 ? '▲' : c12m0 < c12m1 ? '▼' : '─') : '';
+        const c12mColor = c12mArrow === '▲' ? '#4ec94e' : c12mArrow === '▼' ? '#e05c5c' : '#888';
+
         const chartStyle2 = { background: '#151f2e', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
-        const chartTitle2 = (t) => <div style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13, marginBottom: 8, paddingLeft: 8 }}>{t}</div>;
         const TT2 = ({ active, payload, label }) => active && payload?.length ? (
           <div style={{ background: '#1e2a3a', border: '1px solid #2a3a4a', borderRadius: 6, padding: '8px 12px', fontSize: 12 }}>
             <div style={{ color: '#f5c518', marginBottom: 4 }}>{label}</div>
@@ -395,7 +421,17 @@ export default function StockOverview({ ticker }) {
         ) : null;
         return (
           <div style={chartStyle2}>
-            {chartTitle2('📅 月營收（億）vs 營收年增率趨勢（%）')}
+            <div style={{ paddingLeft: 8, marginBottom: 8 }}>
+                  <span style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13 }}>📅 </span>
+                  <span style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13 }}>月營收 </span>
+                  {rev0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#ddd' }}>{rev0}億 </span><span style={{ color: revColor, fontWeight: 700 }}>{revArrow}</span></span>}
+                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 年增率 </span>
+                  {yoy0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#f5c518' }}>{yoy0}% </span><span style={{ color: yoyColor, fontWeight: 700 }}>{yoyArrow}</span></span>}
+                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 近3月 </span>
+                  {c3m0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#4ec94e' }}>{c3m0}% </span><span style={{ color: c3mColor, fontWeight: 700 }}>{c3mArrow}</span></span>}
+                  <span style={{ color: '#888', fontSize: 12 }}> ｜ 近12月 </span>
+                  {c12m0 != null && <span style={{ fontSize: 12 }}><span style={{ color: '#ff7f50' }}>{c12m0}% </span><span style={{ color: c12mColor, fontWeight: 700 }}>{c12mArrow}</span></span>}
+                </div>
             <ResponsiveContainer width="100%" height={220}>
               <ComposedChart data={monthlyChart} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
