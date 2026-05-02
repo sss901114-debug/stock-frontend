@@ -73,11 +73,12 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
               {qData.map(q => {
                 const val = row.calc ? row.calc(q) : (row.key ? q[row.key] : null);
+                const sepStyle = row.sep ? { borderBottom: '2px solid #4C9BB8' } : {};
                 return (
-                  <td key={q['期別']} style={{ ...td, color: row.cf ? row.cf(val) : '#555' }}>
+                  <td key={q['期別']} style={{ ...td, ...sepStyle, color: row.cf ? row.cf(val) : '#555' }}>
                     {fmt(val)}
                   </td>
                 );
@@ -101,7 +102,7 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
                 return (
@@ -156,7 +157,7 @@ export default function StockOverview({ ticker }) {
         { label: '營益率(%)',         key: '營益率',        cf: colorPos },
         { label: '稅前淨利率(%)',     key: '稅前淨利率',    cf: colorPos },
         { label: '稅後淨利率(%)',     key: '稅後淨利率',    cf: colorPos },
-        { label: '每股盈餘(元)',      key: '每股盈餘',      cf: colorPos },
+        { label: '每股盈餘(元)',      key: '每股盈餘',      cf: colorPos, sep: true },
         { label: '銷貨成本率(%)',     key: null, calc: (q) => q['毛利率'] != null ? +(100 - q['毛利率']).toFixed(2) : null, cf: colorNeg },
         { label: '推銷費用率(%)',     key: '推銷費用率',    cf: colorNeg },
         { label: '管理費用率(%)',     key: '管理費用率',    cf: colorNeg },
@@ -175,7 +176,7 @@ export default function StockOverview({ ticker }) {
         { label: '採權益法之長期投資(億)',     key: '採權益法投資_億',   cf: () => '#ccc' },
         { label: '不動產機器設備(億)',         key: '不動產廠房設備_億', cf: () => '#ccc' },
         { label: '無形資產(億)',               key: null,                cf: null },
-        { label: '資產總額(億)',               key: '資產總額_億',       cf: colorPos },
+        { label: '資產總額(億)',               key: '資產總額_億',       cf: colorPos, sep: true },
         { label: '短期借款(億)',               key: '短期借款_億',       cf: colorNeg },
         { label: '應付承兌匯票(億)',           key: null,                cf: null },
         { label: '合約負債(億)',               key: null,                cf: null },
@@ -183,17 +184,17 @@ export default function StockOverview({ ticker }) {
         { label: '一年到期長期負債(億)',       key: null,                cf: null },
         { label: '應付公司債(億)',             key: null,                cf: null },
         { label: '長期借款(億)',               key: null,                cf: null },
-        { label: '負債總額(億)',               key: '負債總額_億',       cf: colorNeg },
+        { label: '負債總額(億)',               key: '負債總額_億',       cf: colorNeg, sep: true },
         { label: '股本(億)',                   key: '股本_億',           cf: () => '#ccc' },
         { label: '母公司股東權益(億)',         key: '股東權益_億',       cf: colorPos },
         { label: '土地(億)',                   key: null,                cf: null },
         { label: '廠房(億)',                   key: null,                cf: null },
-        { label: '設備(億)',                   key: null,                cf: null },
+        { label: '設備(億)',                   key: null,                cf: null, sep: true },
         { label: '原料(億)',                   key: null,                cf: null },
         { label: '在製品(億)',                 key: null,                cf: null },
-        { label: '製成品(億)',                 key: null,                cf: null },
+        { label: '製成品(億)',                 key: null,                cf: null, sep: true },
         { label: '有息負債(億)',               key: null,                cf: null },
-        { label: '財務透明度',                key: null,                cf: null },
+        { label: '財務透明度',                key: null,                cf: null, sep: true },
         { label: '應收帳款週轉天數',           key: null,                cf: null },
         { label: '存貨週轉天數',               key: null,                cf: null },
       ])}
@@ -205,11 +206,11 @@ export default function StockOverview({ ticker }) {
         { label: '應收帳款(增)減(億)',         key: null,                cf: null },
         { label: '存貨(增)減(億)',             key: null,                cf: null },
         { label: '應付帳款增(減)(億)',         key: null,                cf: null },
-        { label: '營業活動現金流入(出)(億)',   key: '營業CF_億',         cf: colorPos },
+        { label: '營業活動現金流入(出)(億)',   key: '營業CF_億',         cf: colorPos, sep: true },
         { label: '(買)賣擁銷後金融資產(億)',  key: null,                cf: null },
         { label: '購置不動產設備(億)',         key: '購置不動產設備_億', cf: colorNeg },
         { label: '處分不動產設備(億)',         key: null,                cf: null },
-        { label: '投資活動現金流入(出)(億)',   key: '投資CF_億',         cf: () => '#ccc' },
+        { label: '投資活動現金流入(出)(億)',   key: '投資CF_億',         cf: () => '#ccc', sep: true },
         { label: '支付現金股利(億)',           key: null,                cf: null },
         { label: '短期借款增(減)(億)',         key: null,                cf: null },
         { label: '應付票券增(減)(億)',         key: null,                cf: null },
@@ -217,7 +218,7 @@ export default function StockOverview({ ticker }) {
         { label: '舉借長期借款(億)',           key: null,                cf: null },
         { label: '償還長期借款(億)',           key: null,                cf: null },
         { label: '現金增資(億)',               key: null,                cf: null },
-        { label: '籌資活動現金流入(出)(億)',   key: '籌資CF_億',         cf: () => '#ccc' },
+        { label: '籌資活動現金流入(出)(億)',   key: '籌資CF_億',         cf: () => '#ccc', sep: true },
         { label: '自由現金流量(億)',           key: '自由CF_億',         cf: colorPos },
         { label: '餘絀現金流量(億)',           key: '餘絀CF_億',         cf: colorPos },
         { label: '盈餘含金量(營業CF/稅前淨利%)', key: '盈餘含金量',     cf: colorPos },
@@ -268,7 +269,7 @@ export default function StockOverview({ ticker }) {
               { label: '近12個月累計營收年增率(%)', fn: (r) => r.cum_12m_pct != null ? Number(r.cum_12m_pct) : null, cf: colorPos },
             ].map((row, ri) => (
               <tr key={row.label} style={{ background: ri % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
                 {mData.map((r, i) => {
                   const val = row.fn(r, i);
                   const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
@@ -297,7 +298,7 @@ export default function StockOverview({ ticker }) {
               { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #4C9BB8' } : {}) }}>{row.label}</td>
                 {dividend.map(r => (
                   <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
                 ))}
