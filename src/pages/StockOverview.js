@@ -125,9 +125,9 @@ export default function StockOverview({ ticker }) {
         <div>
           <h2 style={{ fontSize: 24, fontWeight: 700, color: '#1a7a3a', marginBottom: 4 }}>
             {ticker} {info.name}
-            {closePrice && <span style={{ fontSize: 18, color: '#c8a200', marginLeft: 16, fontWeight: 400 }}>
-              收盤價 <b style={{ color: '#b8860b' }}>{closePrice.close}</b>
-              <span style={{ fontSize: 12, color: '#888', marginLeft: 8 }}>{closePrice.date}</span>
+            {closePrice && <span style={{ fontSize: 26, color: '#111', marginLeft: 48, fontWeight: 400 }}>
+              收盤價 <b style={{ color: '#111', fontSize: 30 }}>{closePrice.close}</b>
+              <span style={{ fontSize: 18, color: '#111', marginLeft: 12 }}>{closePrice.date}</span>
             </span>}
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
