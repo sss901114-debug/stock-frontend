@@ -75,7 +75,7 @@ export default function StockOverview({ ticker }) {
             <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
               <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600 }}>{row.label}</td>
               {qData.map(q => {
-                const val = row.key ? q[row.key] : null;
+                const val = row.calc ? row.calc(q) : (row.key ? q[row.key] : null);
                 return (
                   <td key={q['期別']} style={{ ...td, color: row.cf ? row.cf(val) : '#555' }}>
                     {fmt(val)}
@@ -151,17 +151,17 @@ export default function StockOverview({ ticker }) {
       {sectionTitle('📊 季度損益表（單位：億 / %）')}
       {renderQTable([
         { label: '營業收入(億)',      key: '營業收入_億',  cf: colorPos },
+        { label: '營收年增率(%)',     key: '營收年增率',   cf: colorPos },
         { label: '毛利率(%)',         key: '毛利率',        cf: colorPos },
+        { label: '營益率(%)',         key: '營益率',        cf: colorPos },
+        { label: '稅前淨利率(%)',     key: '稅前淨利率',    cf: colorPos },
+        { label: '稅後淨利率(%)',     key: '稅後淨利率',    cf: colorPos },
+        { label: '每股盈餘(元)',      key: '每股盈餘',      cf: colorPos },
+        { label: '銷貨成本率(%)',     key: null, calc: (q) => q['毛利率'] != null ? +(100 - q['毛利率']).toFixed(2) : null, cf: colorNeg },
         { label: '推銷費用率(%)',     key: '推銷費用率',    cf: colorNeg },
         { label: '管理費用率(%)',     key: '管理費用率',    cf: colorNeg },
         { label: '研發費用率(%)',     key: '研發費用率',    cf: colorNeg },
         { label: '營業費用率(%)',     key: '營業費用率',    cf: colorNeg },
-        { label: '營益率(%)',         key: '營益率',        cf: colorPos },
-        { label: '營外收支率(%)',     key: '業外收支率',    cf: colorPos },
-        { label: '稅前淨利率(%)',     key: '稅前淨利率',    cf: colorPos },
-        { label: '稅後淨利率(%)',     key: '稅後淨利率',    cf: colorPos },
-        { label: '每股盈餘(元)',      key: '每股盈餘',      cf: colorPos },
-        { label: '營收年增率(%)',     key: '營收年增率',    cf: colorPos },
       ])}
 
       {/* ── 季度資產負債表 (圖1) ── */}
