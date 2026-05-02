@@ -158,15 +158,49 @@ export default function StockOverview({ ticker }) {
         </div>
       </div>
 
-      {/* 預估EPS */}
-      {estEps && (
-        <div style={{ background: '#1e2a3a', borderRadius: 8, padding: '12px 16px', marginBottom: 16, display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-          <span style={{ color: '#aaa', fontSize: 13 }}>🔮 預估下季EPS</span>
-          <span style={{ color: '#fff' }}>近3月營收：<b style={{ color: '#4ec94e' }}>{estEps.rev_3m}億</b></span>
-          <span style={{ color: '#fff' }}>預估毛利率：<b style={{ color: '#4ec94e' }}>{estEps.est_gpm}%</b></span>
-          <span style={{ color: '#fff' }}>預估EPS：<b style={{ color: '#f5c518', fontSize: 18 }}>{estEps.est_eps ?? 'N/A'}</b></span>
-        </div>
-      )}
+      {/* 財務摘要列 */}
+      {(() => {
+        const q0 = qData[0] || {};
+        const q4eps = qData.slice(0,4).reduce((s,q) => s + (Number(q['每股盈餘']) || 0), 0);
+        const te = q0['股東權益_億']; const cs = q0['股本_億'];
+        const bv = (te && cs && cs !== 0) ? te / cs * 10 : null;
+        const cp = closePrice ? Number(closePrice.close) : null;
+        const pe = (cp && q4eps && q4eps > 0) ? (cp / q4eps).toFixed(1) : null;
+        const pb = (cp && bv) ? (cp / bv).toFixed(2) : null;
+        const m0 = mData[0] || {};
+
+        const C = ({ label, value, color, big }) => (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 14px', borderRight: '1px solid #2a3a4a', minWidth: 90 }}>
+            <span style={{ color: '#888', fontSize: 11, marginBottom: 3, whiteSpace: 'nowrap' }}>{label}</span>
+            <span style={{ color: color || '#ddd', fontWeight: big ? 700 : 600, fontSize: big ? 17 : 14, whiteSpace: 'nowrap' }}>{value ?? '-'}</span>
+          </div>
+        );
+
+        return (
+          <div style={{ background: '#1a2535', borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
+            {/* 第一行：現況 */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #2a3a4a', padding: '4px 0' }}>
+              <C label="最近4季EPS" value={q4eps ? q4eps.toFixed(2) : '-'} color="#f5c518" big />
+              <C label="最近1季毛利率" value={q0['毛利率'] != null ? q0['毛利率']+'%' : '-'} color="#4ec94e" />
+              <C label="最近1季營益率" value={q0['營益率'] != null ? q0['營益率']+'%' : '-'} color="#4ec94e" />
+              <C label="最近1季營收年增率" value={q0['營收年增率'] != null ? q0['營收年增率']+'%' : '-'} color={Number(q0['營收年增率']) >= 0 ? '#4ec94e' : '#e05c5c'} />
+              <C label="最近1月營收年增率" value={m0.yoy_pct != null ? Number(m0.yoy_pct).toFixed(1)+'%' : '-'} color={Number(m0.yoy_pct) >= 0 ? '#4ec94e' : '#e05c5c'} />
+              <C label="目前本益比" value={pe ? pe+'x' : '-'} color="#c8a200" />
+              <C label="股價淨值比" value={pb ? pb+'x' : '-'} color="#c8a200" />
+            </div>
+            {/* 第二行：預估 */}
+            {estEps && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', padding: '4px 0', background: '#151f2e' }}>
+                <div style={{ color: '#7a7aaa', fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center' }}>🔮 預估</div>
+                <C label="預估1季毛利率" value={estEps.est_gpm != null ? estEps.est_gpm+'%' : '-'} color="#7ec8e3" />
+                <C label="預估1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
+                <C label="預估1季EPS" value={estEps.est_eps ?? '-'} color="#f5c518" big />
+                <C label="預估4季EPS" value={estEps.est_eps_4q ?? '-'} color="#f5c518" big />
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
 
       {/* ── AI 分析報告 ── */}
