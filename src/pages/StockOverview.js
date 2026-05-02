@@ -14,6 +14,7 @@ export default function StockOverview({ ticker }) {
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
   const [closePrice, setClosePrice] = useState(null);
+  const [brief, setBrief] = useState('');
   const [aiReport, setAiReport] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
 
@@ -22,6 +23,7 @@ export default function StockOverview({ ticker }) {
     setLoading(true);
     setClosePrice(null);
     setAiReport('');
+    setBrief('');
     Promise.all([
       getCompanyInfo(ticker).catch(() => null),
       getQuarterly(ticker).catch(() => []),
@@ -37,6 +39,10 @@ export default function StockOverview({ ticker }) {
     fetch(`${API_URL}/api/company/${ticker}/close-price`)
       .then(r => r.json())
       .then(d => { if (d.close) setClosePrice(d); })
+      .catch(() => {});
+    fetch(`${API_URL}/api/company/${ticker}/brief`)
+      .then(r => r.json())
+      .then(d => { if (d.brief) setBrief(d.brief); })
       .catch(() => {});
   }, [ticker]);
 
@@ -136,6 +142,7 @@ export default function StockOverview({ ticker }) {
             </span>}
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
+          {brief && <span style={{ color: '#999', fontSize: 12, marginTop: 4, display: 'block', maxWidth: 800, lineHeight: 1.6 }}>{brief}</span>}
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={async () => {
@@ -192,10 +199,15 @@ export default function StockOverview({ ticker }) {
             {estEps && (
               <div style={{ display: 'flex', flexWrap: 'wrap', padding: '4px 0', background: '#151f2e' }}>
                 <div style={{ color: '#7a7aaa', fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center' }}>🔮 預估</div>
-                <C label="預估1季毛利率" value={estEps.est_gpm != null ? estEps.est_gpm+'%' : '-'} color="#7ec8e3" />
-                <C label="預估1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
-                <C label="預估1季EPS" value={estEps.est_eps ?? '-'} color="#f5c518" big />
-                <C label="預估4季EPS" value={estEps.est_eps_4q ?? '-'} color="#f5c518" big />
+                <C label="預估未來1季毛利率" value={estEps.est_gpm != null ? estEps.est_gpm+'%' : '-'} color="#7ec8e3" />
+                <C label="預估未來1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
+                <C label="預估未來1季EPS" value={estEps.est_eps ?? '-'} color="#f5c518" big />
+                <C label="預估未來4季EPS" value={estEps.est_eps_4q ?? '-'} color="#f5c518" big />
+                <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', flex: 1 }}>
+                  <span style={{ color: '#666', fontSize: 10, lineHeight: 1.5 }}>
+                    ⚠️ 本預估數據係依財務數據邏輯推演，僅供投資參考。<br/>預估結果不代表實際績效，投資人應審慎判斷，自負盈虧。
+                  </span>
+                </div>
               </div>
             )}
           </div>
