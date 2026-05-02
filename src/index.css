@@ -1,6 +1,34 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Barlow:wght@300;400;500&display=swap');
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f0f2f5; color: #111; }
-:root {
-  --blue: #4C9BE8; --green: #2A9D8F; --red: #E63946;
-  --orange: #F4A261; --sidebar: #1a1a2e; --card: #ffffff;
+
+body {
+  font-family: 'Barlow', sans-serif;
+  background: #080b10;
+  color: #d8e8f4;
 }
+
+:root {
+  --bg-primary: #080b10;
+  --bg-secondary: #070a0f;
+  --bg-card: #0b101a;
+  --bg-hover: #0d1828;
+  --border: #1a2a3c;
+  --border-dim: #0f1c2a;
+  --silver: linear-gradient(135deg, #90c0dc, #d0eeff);
+  --silver-text: #c0d8ea;
+  --accent: #5a90b8;
+  --green: #3ed888;
+  --amber: #d8a840;
+  --red: #e05050;
+  --text-primary: #d8e8f4;
+  --text-secondary: #6a8ea8;
+  --text-dim: #3a5870;
+  --font-mono: 'JetBrains Mono', monospace;
+  --font-title: 'Rajdhani', sans-serif;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #060910; }
+::-webkit-scrollbar-thumb { background: #1e3040; border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: #2a4060; }
