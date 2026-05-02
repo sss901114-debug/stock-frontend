@@ -268,7 +268,7 @@ export default function StockOverview({ ticker }) {
 
         return (
           <div style={{ marginBottom: 8 }}>
-            {/* 第一排：圖1 + 圖2 並列 */}
+            {/* 排1：獲利能力 + 費用率 */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
                 {chartTitle('📊 營業收入（億）vs 獲利能力（%）')}
@@ -305,7 +305,7 @@ export default function StockOverview({ ticker }) {
                 </ResponsiveContainer>
               </div>
             </div>
-            {/* 第二排：圖3 左半 */}
+            {/* 排2：不透明資產 + 稅前淨利/營業CF */}
             <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
                 {chartTitle('📊 不透明資產合計（億）vs 財務透明度（%）')}
@@ -322,62 +322,55 @@ export default function StockOverview({ ticker }) {
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }} />
-            </div>
-
-            {/* 第三排：圖4 稅前淨利+營業CF、圖5 餘絀現金+有息負債 */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
                 {chartTitle('📊 稅前淨利 vs 營業活動現金流（億）')}
                 <ResponsiveContainer width="100%" height={200}>
                   <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
                     <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
-                    <YAxis tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis tick={{ fill: '#aaa', fontSize: 9 }} width={44} />
                     <Tooltip content={<TT />} />
                     <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
-                    <Bar dataKey="稅前淨利" fill="#f5c518" opacity={0.85} name="稅前淨利(億)" />
-                    <Bar dataKey="營業CF" fill="#4C9BB8" opacity={0.85} name="營業活動現金(億)" />
+                    <Bar dataKey="稅前淨利億" fill="#f5c518" opacity={0.85} name="稅前淨利(億)" />
+                    <Bar dataKey="營業CF億" fill="#4C9BB8" opacity={0.85} name="營業活動現金(億)" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
+            </div>
+            {/* 排3：餘絀現金+有息負債 + 資產結構 */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
                 {chartTitle('📊 餘絀現金（億）vs 有息負債（億）')}
                 <ResponsiveContainer width="100%" height={200}>
                   <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
                     <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
-                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={44} />
                     <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 9 }} width={44} />
                     <Tooltip content={<TT />} />
                     <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
-                    <Bar yAxisId="left" dataKey="餘絀CF" fill="#4ec94e" opacity={0.85} name="餘絀現金(億)" />
-                    <Line yAxisId="right" type="monotone" dataKey="有息負債" stroke="#e05c5c" strokeWidth={2} dot={false} name="有息負債(億)" />
+                    <Bar yAxisId="left" dataKey="餘絀CF億" fill="#4ec94e" opacity={0.85} name="餘絀現金(億)" />
+                    <Line yAxisId="right" type="monotone" dataKey="有息負債億" stroke="#e05c5c" strokeWidth={2} dot={false} name="有息負債(億)" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
-            </div>
-
-            {/* 第四排：圖6 營收+資產結構 */}
-            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
               <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
-                {chartTitle('📊 營業收入（億）vs 資產結構（億）')}
+                {chartTitle('📊 資產結構（億）vs 營業收入（億）')}
                 <ResponsiveContainer width="100%" height={200}>
                   <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
                     <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
-                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={44} />
                     <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 9 }} width={44} />
                     <Tooltip content={<TT />} />
                     <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
-                    <Bar yAxisId="left" dataKey="存貨" fill="#ff9f40" opacity={0.8} name="存貨(億)" />
-                    <Bar yAxisId="left" dataKey="不動產設備" fill="#4C9BB8" opacity={0.8} name="不動產機器設備(億)" />
-                    <Bar yAxisId="left" dataKey="無形資產Q" fill="#b87fdb" opacity={0.8} name="無形資產(億)" />
+                    <Bar yAxisId="left" dataKey="存貨億" fill="#ff9f40" opacity={0.8} name="存貨(億)" />
+                    <Bar yAxisId="left" dataKey="不動產設備億" fill="#4C9BB8" opacity={0.8} name="不動產機器設備(億)" />
+                    <Bar yAxisId="left" dataKey="無形資產億" fill="#b87fdb" opacity={0.8} name="無形資產(億)" />
                     <Line yAxisId="right" type="monotone" dataKey="營業收入" stroke="#f5c518" strokeWidth={2} dot={false} name="營業收入(億)" />
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
-              <div style={{ flex: 1, minWidth: 0 }} />
             </div>
           </div>
         );
@@ -385,7 +378,7 @@ export default function StockOverview({ ticker }) {
 
       {/* ── 月營收圖表 ── */}
       {mData.length > 0 && (() => {
-        const monthlyChart = [...mData].reverse().slice(-24).map(r => ({
+        const monthlyChart = [...mData].reverse().map(r => ({
           月份: r.period,
           月營收: r.revenue ? +(r.revenue/100000).toFixed(2) : null,
           營收年增率: r.yoy_pct != null ? +Number(r.yoy_pct).toFixed(1) : null,
