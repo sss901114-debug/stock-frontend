@@ -399,7 +399,7 @@ export default function StockOverview({ ticker }) {
         { label: '償還長期借款(億)',           key: '償還長期借款_億',    cf: colorNeg },
         { label: '現金增(減)資(億)',           key: '現金增資_億',        cf: () => '#ccc' },
         { label: '籌資活動現金流入(出)(億)',   key: '籌資CF_億',         cf: () => '#ccc', sep: true },
-        { label: '自由現金流量(億)',           key: '自由CF_億',         cf: colorPos },
+        { label: '修正式自由現金流量(億)',      key: '自由CF_億',         cf: colorPos },
         { label: '餘絀現金流量(億)',           key: '餘絀CF_億',         cf: colorPos },
         { label: '盈餘含金量(營業CF/稅前淨利%)', key: '盈餘含金量',     cf: colorPos },
       ])}
@@ -424,7 +424,7 @@ export default function StockOverview({ ticker }) {
         { label: '投資活動現金流入(出)(億)',   key: 'inv_cashflow',      cf: () => '#ccc' },
         { label: '籌資活動現金流入(出)(億)',   key: 'fin_cashflow',      cf: () => '#ccc' },
         { label: '支付現金股利(億)',           key: null,                cf: null },
-        { label: '自由現金流量(億)',           key: 'free_cashflow',     cf: colorPos },
+        { label: '修正式自由現金流量(億)',      key: 'free_cashflow',     cf: colorPos },
         { label: '餘絀現金流量(億)',           key: 'surplus_cf',        cf: colorPos },
         { label: '業外收支/營收(%)',           key: 'non_op_rev_ratio',  cf: colorPos },
       ])}
