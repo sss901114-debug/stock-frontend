@@ -184,59 +184,61 @@ export default function StockOverview({ ticker }) {
 
         return (
           <div style={{ marginBottom: 8 }}>
-            {/* 圖1：營業收入 + 利潤率 */}
-            <div style={chartStyle}>
-              {chartTitle('📊 營業收入（億）vs 獲利能力（%）')}
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
-                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" />
-                  <Tooltip content={<TT />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
-                  <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
-                  <Line yAxisId="right" type="monotone" dataKey="毛利率" stroke="#4ec94e" strokeWidth={2} dot={false} name="毛利率%" />
-                  <Line yAxisId="right" type="monotone" dataKey="營益率" stroke="#f5c518" strokeWidth={2} dot={false} name="營益率%" />
-                  <Line yAxisId="right" type="monotone" dataKey="稅前淨利率" stroke="#ff7f50" strokeWidth={2} dot={false} name="稅前淨利率%" />
-                </ComposedChart>
-              </ResponsiveContainer>
+            {/* 第一排：圖1 + 圖2 並列 */}
+            <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
+              <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
+                {chartTitle('📊 營業收入（億）vs 獲利能力（%）')}
+                <ResponsiveContainer width="100%" height={200}>
+                  <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                    <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
+                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 9 }} unit="%" width={36} />
+                    <Tooltip content={<TT />} />
+                    <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
+                    <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
+                    <Line yAxisId="right" type="monotone" dataKey="毛利率" stroke="#4ec94e" strokeWidth={2} dot={false} name="毛利率%" />
+                    <Line yAxisId="right" type="monotone" dataKey="營益率" stroke="#f5c518" strokeWidth={2} dot={false} name="營益率%" />
+                    <Line yAxisId="right" type="monotone" dataKey="稅前淨利率" stroke="#ff7f50" strokeWidth={2} dot={false} name="稅前淨利率%" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+              <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
+                {chartTitle('📊 營業收入（億）vs 費用率（%）')}
+                <ResponsiveContainer width="100%" height={200}>
+                  <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                    <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
+                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 9 }} unit="%" width={36} />
+                    <Tooltip content={<TT />} />
+                    <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
+                    <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
+                    <Line yAxisId="right" type="monotone" dataKey="推銷費用率" stroke="#e05c5c" strokeWidth={2} dot={false} name="推銷費用率%" />
+                    <Line yAxisId="right" type="monotone" dataKey="管理費用率" stroke="#ff9f40" strokeWidth={2} dot={false} name="管理費用率%" />
+                    <Line yAxisId="right" type="monotone" dataKey="研發費用率" stroke="#b87fdb" strokeWidth={2} dot={false} name="研發費用率%" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
             </div>
-
-            {/* 圖2：營業收入 + 費用率 */}
-            <div style={chartStyle}>
-              {chartTitle('📊 營業收入（億）vs 費用率（%）')}
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
-                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" />
-                  <Tooltip content={<TT />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
-                  <Bar yAxisId="left" dataKey="營業收入" fill="#4C9BB8" opacity={0.8} name="營業收入(億)" />
-                  <Line yAxisId="right" type="monotone" dataKey="推銷費用率" stroke="#e05c5c" strokeWidth={2} dot={false} name="推銷費用率%" />
-                  <Line yAxisId="right" type="monotone" dataKey="管理費用率" stroke="#ff9f40" strokeWidth={2} dot={false} name="管理費用率%" />
-                  <Line yAxisId="right" type="monotone" dataKey="研發費用率" stroke="#b87fdb" strokeWidth={2} dot={false} name="研發費用率%" />
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-
-            {/* 圖3：不透明資產 + 財務透明度 */}
-            <div style={chartStyle}>
-              {chartTitle('📊 不透明資產合計（億）vs 財務透明度（%）')}
-              <ResponsiveContainer width="100%" height={220}>
-                <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
-                  <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 10 }} />
-                  <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 10 }} unit="%" domain={[0, 100]} />
-                  <Tooltip content={<TT />} />
-                  <Legend wrapperStyle={{ fontSize: 11, color: '#ccc' }} />
-                  <Bar yAxisId="left" dataKey="不透明資產" fill="#e05c5c" opacity={0.8} name="不透明資產合計(億)" />
-                  <Line yAxisId="right" type="monotone" dataKey="財務透明度" stroke="#4ec94e" strokeWidth={2} dot={false} name="財務透明度%" />
-                </ComposedChart>
-              </ResponsiveContainer>
+            {/* 第二排：圖3 左半 */}
+            <div style={{ display: 'flex', gap: 8 }}>
+              <div style={{ ...chartStyle, flex: 1, minWidth: 0 }}>
+                {chartTitle('📊 不透明資產合計（億）vs 財務透明度（%）')}
+                <ResponsiveContainer width="100%" height={200}>
+                  <ComposedChart data={chartData} margin={{ top: 4, right: 16, left: 0, bottom: 4 }}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#2a3a4a" />
+                    <XAxis dataKey="期別" tick={{ fill: '#aaa', fontSize: 9 }} />
+                    <YAxis yAxisId="left" tick={{ fill: '#aaa', fontSize: 9 }} width={40} />
+                    <YAxis yAxisId="right" orientation="right" tick={{ fill: '#aaa', fontSize: 9 }} unit="%" domain={[0, 100]} width={36} />
+                    <Tooltip content={<TT />} />
+                    <Legend wrapperStyle={{ fontSize: 10, color: '#ccc' }} />
+                    <Bar yAxisId="left" dataKey="不透明資產" fill="#e05c5c" opacity={0.8} name="不透明資產合計(億)" />
+                    <Line yAxisId="right" type="monotone" dataKey="財務透明度" stroke="#4ec94e" strokeWidth={2} dot={false} name="財務透明度%" />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }} />
             </div>
           </div>
         );
