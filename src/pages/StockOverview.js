@@ -77,8 +77,8 @@ export default function StockOverview({ ticker }) {
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+            <tr key={i} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
+              <td style={{ ...td, textAlign: 'left', color: '#90c0dc', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {qData.map(q => {
                 const val = row.calc ? row.calc(q) : (row.key ? q[row.key] : null);
                 const sepStyle = row.sep ? { borderBottom: '2px solid #ffffff' } : {};
@@ -106,7 +106,7 @@ export default function StockOverview({ ticker }) {
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+            <tr key={i} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
               <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
@@ -138,9 +138,9 @@ export default function StockOverview({ ticker }) {
           </h2>
           {info.sub_industry && <span style={{ background: '#2a3a4a', color: '#4C9BB8', padding: '2px 8px', borderRadius: 4, fontSize: 12 }}>{info.sub_industry}</span>}
           {(info.business1 || info.product_mix) && (
-            <div style={{ color: '#bbb', fontSize: 12, marginTop: 4, lineHeight: 1.6, maxWidth: 900 }}>
+            <div style={{ color: '#4a7090', fontSize: 11, marginTop: 4, lineHeight: 1.7, maxWidth: 900 }}>
               {[info.business1, info.business2, info.business3].filter(Boolean).join('；')}
-              {info.product_mix && <span style={{ color: '#90c8e8', marginLeft: 6 }}>【{info.product_mix}】</span>}
+              {info.product_mix && <span style={{ color: '#5a90b8', marginLeft: 6 }}>【{info.product_mix}】</span>}
             </div>
           )}
         </div>
@@ -155,11 +155,11 @@ export default function StockOverview({ ticker }) {
               setAiLoading(false);
             }}
             disabled={aiLoading}
-            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #f5c518', background: aiLoading ? '#555' : '#2a1f00', color: '#f5c518', cursor: aiLoading ? 'default' : 'pointer', fontWeight: 600, whiteSpace: 'nowrap' }}>
+            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #f5c518', background: aiLoading ? '#1a2a3c' : 'linear-gradient(135deg,#2e5872,#4080a0)', color: '#eef8ff', cursor: aiLoading ? 'default' : 'pointer', fontWeight: 700, whiteSpace: 'nowrap', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>
             {aiLoading ? '⏳ 健診中...' : '🤖 AI個股財務健診'}
           </button>
           <button onClick={() => inWatchlist ? removeWatchlist(ticker).then(() => setInWatchlist(false)) : addWatchlist(ticker, info?.name || '').then(() => setInWatchlist(true))}
-            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #4C9BB8', background: inWatchlist ? '#4C9BB8' : 'transparent', color: inWatchlist ? '#fff' : '#4C9BB8', cursor: 'pointer', fontWeight: 600 }}>
+            style={{ padding: '8px 20px', borderRadius: 8, border: '1px solid #2a4060', background: inWatchlist ? '#1e3a52' : 'transparent', color: inWatchlist ? '#90c0dc' : '#3a5870', cursor: 'pointer', fontWeight: 600 }}>
             {inWatchlist ? '★ 已追蹤' : '☆ 加入追蹤'}
           </button>
         </div>
@@ -177,17 +177,17 @@ export default function StockOverview({ ticker }) {
         const m0 = mData[0] || {};
 
         const C = ({ label, value, color, big }) => (
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '6px 14px', borderRight: '1px solid #2a3a4a', minWidth: 90 }}>
-            <span style={{ color: '#888', fontSize: 11, marginBottom: 3, whiteSpace: 'nowrap' }}>{label}</span>
-            <span style={{ color: color || '#ddd', fontWeight: big ? 700 : 600, fontSize: big ? 17 : 14, whiteSpace: 'nowrap' }}>{value ?? '-'}</span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '8px 12px', borderRight: '1px solid #0f1c2a', minWidth: 90 }}>
+            <span style={{ color: '#3a5870', fontSize: 9, marginBottom: 4, whiteSpace: 'nowrap', letterSpacing: '1.5px', textTransform: 'uppercase', fontFamily: "'Rajdhani',sans-serif", fontWeight: 600 }}>{label}</span>
+            <span style={{ color: color || '#8ab0cc', fontWeight: big ? 600 : 500, fontSize: big ? 16 : 14, whiteSpace: 'nowrap', fontFamily: "'JetBrains Mono',monospace" }}>{value ?? '-'}</span>
           </div>
         );
 
         return (
-          <div style={{ background: '#1a2535', borderRadius: 8, marginBottom: 12, overflow: 'hidden' }}>
+          <div style={{ background: '#080b10', borderRadius: 0, marginBottom: 1, overflow: 'hidden', borderBottom: '1px solid #1a2a3c' }}>
             {/* 第一行：現況 */}
             <div style={{ display: 'flex', flexWrap: 'wrap', borderBottom: '1px solid #2a3a4a', padding: '4px 0' }}>
-              <C label="最近4季EPS" value={q4eps ? q4eps.toFixed(2) : '-'} color="#f5c518" big />
+              <C label="最近4季EPS" value={q4eps ? q4eps.toFixed(2) : '-'} color="#c0e0f8" big />
               <C label="最近1季毛利率" value={q0['毛利率'] != null ? q0['毛利率']+'%' : '-'} color="#4ec94e" />
               <C label="最近1季營益率" value={q0['營益率'] != null ? q0['營益率']+'%' : '-'} color="#4ec94e" />
               <C label="最近1季營收年增率" value={q0['營收年增率'] != null ? q0['營收年增率']+'%' : '-'} color={Number(q0['營收年增率']) >= 0 ? '#4ec94e' : '#e05c5c'} />
@@ -197,12 +197,12 @@ export default function StockOverview({ ticker }) {
             </div>
             {/* 第二行：預估 */}
             {estEps && (
-              <div style={{ display: 'flex', flexWrap: 'wrap', padding: '4px 0', background: '#151f2e' }}>
-                <div style={{ color: '#7a7aaa', fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center' }}>🔮 預估</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', padding: '4px 0', background: '#060910' }}>
+                <div style={{ color: '#2a4060', fontSize: 9, padding: '8px 12px', display: 'flex', alignItems: 'center', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, letterSpacing: 2 }}>🔮 預估</div>
                 <C label="預估未來1季毛利率" value={estEps.est_gpm != null ? estEps.est_gpm+'%' : '-'} color="#7ec8e3" />
                 <C label="預估未來1季營益率" value={estEps.est_opi != null ? estEps.est_opi+'%' : '-'} color="#7ec8e3" />
-                <C label="預估未來1季EPS" value={estEps.est_eps ?? '-'} color="#f5c518" big />
-                <C label="預估未來4季EPS" value={estEps.est_eps_4q ?? '-'} color="#f5c518" big />
+                <C label="預估未來1季EPS" value={estEps.est_eps ?? '-'} color="#c0e0f8" big />
+                <C label="預估未來4季EPS" value={estEps.est_eps_4q ?? '-'} color="#c0e0f8" big />
                 {(() => {
                   const eps3q = qData.slice(1,4).reduce((s,q) => s+(Number(q['每股盈餘'])||0), 0);
                   const base1q = eps3q + (estEps.est_eps || 0);
@@ -214,7 +214,7 @@ export default function StockOverview({ ticker }) {
                   </>);
                 })()}
                 <div style={{ display: 'flex', alignItems: 'center', padding: '6px 16px', flex: 1 }}>
-                  <span style={{ color: '#666', fontSize: 10, lineHeight: 1.5 }}>
+                  <span style={{ color: '#2a4260', fontSize: 9, lineHeight: 1.5 }}>
                     ⚠️ 本預估數據係依財務數據邏輯推演，僅供投資參考。<br/>預估結果不代表實際績效，投資人應審慎判斷，自負盈虧。
                   </span>
                 </div>
@@ -227,12 +227,12 @@ export default function StockOverview({ ticker }) {
 
       {/* ── AI 分析報告 ── */}
       {(aiReport || aiLoading) && (
-        <div style={{ background: '#111a27', border: '1px solid #2a3a4a', borderRadius: 10, padding: '20px 24px', marginBottom: 16 }}>
-          <div style={{ color: '#f5c518', fontWeight: 700, fontSize: 15, marginBottom: 12 }}>🤖 AI個股財務健診報告</div>
+        <div style={{ background: '#070a0f', border: '1px solid #1a2a3c', borderRadius: 0, padding: '20px 24px', marginBottom: 1 }}>
+          <div style={{ color: '#90c0dc', fontWeight: 700, fontSize: 13, marginBottom: 12, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>🤖 AI個股財務健診報告</div>
           {aiLoading ? (
             <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
           ) : (
-            <div style={{ color: '#ddd', fontSize: 14, lineHeight: 1.85, whiteSpace: 'pre-wrap' }}>
+            <div style={{ color: '#8ab0c8', fontSize: 13, lineHeight: 1.9, whiteSpace: 'pre-wrap' }}>
               {aiReport}
             </div>
           )}
@@ -274,11 +274,11 @@ export default function StockOverview({ ticker }) {
           無形資產億: q['無形資產_億'] ?? null,
         }));
 
-        const chartStyle = { background: '#151f2e', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
-        const chartTitle = (t) => <div style={{ color: '#4C9BB8', fontWeight: 700, fontSize: 13, marginBottom: 8, paddingLeft: 8 }}>{t}</div>;
+        const chartStyle = { background: '#080b10', padding: '10px', marginBottom: 1 };
+        const chartTitle = (t) => <div style={{ color: '#3a6080', fontWeight: 600, fontSize: 9, marginBottom: 6, paddingLeft: 4, letterSpacing: '2.5px', fontFamily: "'Rajdhani',sans-serif", display:'flex', alignItems:'center', gap:6 }}><span style={{display:'inline-block',width:14,height:1,background:'linear-gradient(90deg,#80b0d0,transparent)'}}></span>{t.toUpperCase()}</div>;
         const TT = ({ active, payload, label }) => active && payload?.length ? (
-          <div style={{ background: '#1e2a3a', border: '1px solid #2a3a4a', borderRadius: 6, padding: '8px 12px', fontSize: 12 }}>
-            <div style={{ color: '#f5c518', marginBottom: 4 }}>{label}</div>
+          <div style={{ background: '#0d1828', border: '1px solid #1e3040', borderRadius: 0, padding: '8px 12px', fontSize: 12 }}>
+            <div style={{ color: '#90c0dc', marginBottom: 4, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1 }}>{label}</div>
             {payload.map((p, i) => <div key={i} style={{ color: p.color }}>{p.name}: {p.value != null ? p.value.toFixed(2) : '-'}</div>)}
           </div>
         ) : null;
@@ -422,10 +422,10 @@ export default function StockOverview({ ticker }) {
         const c12mArrow = (c12m0 != null && c12m1 != null) ? (c12m0 > c12m1 ? '▲' : c12m0 < c12m1 ? '▼' : '─') : '';
         const c12mColor = c12mArrow === '▲' ? '#4ec94e' : c12mArrow === '▼' ? '#e05c5c' : '#888';
 
-        const chartStyle2 = { background: '#151f2e', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
+        const chartStyle2 = { background: '#060910', borderRadius: 8, padding: '16px 8px', marginBottom: 16 };
         const TT2 = ({ active, payload, label }) => active && payload?.length ? (
-          <div style={{ background: '#1e2a3a', border: '1px solid #2a3a4a', borderRadius: 6, padding: '8px 12px', fontSize: 12 }}>
-            <div style={{ color: '#f5c518', marginBottom: 4 }}>{label}</div>
+          <div style={{ background: '#0d1828', border: '1px solid #1e3040', borderRadius: 0, padding: '8px 12px', fontSize: 12 }}>
+            <div style={{ color: '#90c0dc', marginBottom: 4, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1 }}>{label}</div>
             {payload.map((p, i) => <div key={i} style={{ color: p.color }}>{p.name}: {p.value != null ? p.value : '-'}</div>)}
           </div>
         ) : null;
@@ -612,7 +612,7 @@ export default function StockOverview({ ticker }) {
               { label: 'EPS',       key: 'eps_prev_year',    cf: colorPos },
               { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
             ].map((row, i) => (
-              <tr key={row.key} style={{ background: i % 2 === 0 ? '#151f2e' : '#1a2535' }}>
+              <tr key={row.key} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
                 <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {dividend.map(r => (
                   <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
