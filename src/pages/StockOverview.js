@@ -105,8 +105,9 @@ export default function StockOverview({ ticker }) {
               <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
+                const sepStyle = row.sep ? { borderBottom: '2px solid #ffffff' } : {};
                 return (
-                  <td key={r.year} style={{ ...td, color: row.cf ? row.cf(val) : '#555' }}>
+                  <td key={r.year} style={{ ...td, ...sepStyle, color: row.cf ? row.cf(val) : '#555' }}>
                     {fmt(val)}
                   </td>
                 );
@@ -230,7 +231,7 @@ export default function StockOverview({ ticker }) {
         { label: '資產總額(億)',               key: 'total_assets',      cf: colorPos },
         { label: '負債總額(億)',               key: 'total_liab',        cf: colorNeg },
         { label: '母公司股東權益總額(億)',     key: 'total_equity',      cf: colorPos },
-        { label: '股本(億)',                   key: 'common_stock',      cf: () => '#ccc' },
+        { label: '股本(億)',                   key: 'common_stock',      cf: () => '#ccc', sep: true },
         { label: '營業收入(億)',               key: 'revenue',           cf: () => '#ccc' },
         { label: '銷貨成本(億)',               key: 'cost',              cf: colorNeg },
         { label: '營業毛利(億)',               key: 'gross_profit',      cf: colorPos },
@@ -239,7 +240,7 @@ export default function StockOverview({ ticker }) {
         { label: '營外收支(億)',               key: 'non_op_income',     cf: colorPos },
         { label: '稅前淨利(億)',               key: 'pretax_income',     cf: colorPos },
         { label: '母公司淨利(億)',             key: 'net_income',        cf: colorPos },
-        { label: '每股盈餘(元)',               key: 'eps',               cf: colorPos },
+        { label: '每股盈餘(元)',               key: 'eps',               cf: colorPos, sep: true },
         { label: '營業活動現金流入(出)(億)',   key: 'op_cashflow',       cf: colorPos },
         { label: '投資活動現金流入(出)(億)',   key: 'inv_cashflow',      cf: () => '#ccc' },
         { label: '籌資活動現金流入(出)(億)',   key: 'fin_cashflow',      cf: () => '#ccc' },
