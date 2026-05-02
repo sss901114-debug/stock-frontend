@@ -32,12 +32,12 @@
 }
 
 .top-nav a {
-  padding: 10px 16px;
+  padding: 12px 20px;
   text-decoration: none;
   color: var(--text-dim);
   font-weight: 600;
-  font-size: 11px;
-  letter-spacing: 2px;
+  font-size: 14px;
+  letter-spacing: 3px;
   font-family: var(--font-title);
   position: relative;
   transition: color 0.2s;
