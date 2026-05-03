@@ -16,6 +16,7 @@ export default function StockOverview({ ticker }) {
   const [closePrice, setClosePrice] = useState(null);
   const [aiReport, setAiReport] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
+  const [reportDate, setReportDate] = useState('');
 
   useEffect(() => {
     if (!ticker) return;
@@ -145,7 +146,7 @@ export default function StockOverview({ ticker }) {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           <button onClick={async () => {
-              setAiLoading(true); setAiReport('');
+              setAiLoading(true); setAiReport(''); const d=new Date(); setReportDate(`${d.getFullYear()}年${String(d.getMonth()+1).padStart(2,'0')}月${String(d.getDate()).padStart(2,'0')}日`);
               try {
                 const res = await fetch(`${API_URL}/api/company/${ticker}/analysis`, { method: 'POST' });
                 const data = await res.json();
@@ -227,16 +228,10 @@ export default function StockOverview({ ticker }) {
       {/* ── AI 分析報告 ── */}
       {(aiReport || aiLoading) && (
         <div style={{ background: '#070a0f', border: '1px solid #1a2a3c', borderRadius: 0, padding: '20px 24px', marginBottom: 1 }}>
-          {(() => {
-            const d = new Date();
-            const dateStr = `${d.getFullYear()}年${String(d.getMonth()+1).padStart(2,'0')}月${String(d.getDate()).padStart(2,'0')}日`;
-            return (
-              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
-                <span style={{ color: '#a8d0e8', fontWeight: 700, fontSize: 15, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>🤖 AI個股財務健診報告</span>
-                <span style={{ color: '#6a98b8', fontSize: 12 }}>（報告日期：{dateStr}）</span>
-              </div>
-            );
-          })()}
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
+            <span style={{ color: '#a8d0e8', fontWeight: 700, fontSize: 15, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>🤖 AI個股財務健診報告</span>
+            {reportDate && <span style={{ color: '#6a98b8', fontSize: 12 }}>（報告日期：{reportDate}）</span>}
+          </div>
           {aiLoading ? (
             <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
           ) : (
