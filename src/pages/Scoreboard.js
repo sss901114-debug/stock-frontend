@@ -40,6 +40,82 @@ const ScoreBar = ({ score }) => {
         {score > 0 ? '+' : ''}{score?.toFixed(1)}
       </span>
       <span style={{ color: '#3a6080', fontSize: 10 }}>/ 10</span>
+
+      {/* 排行榜 */}
+      <div style={S.card}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <span style={{ ...S.label, marginBottom: 0 }}>🏆 總分前100名排行榜</span>
+          <button style={{ ...S.btn, padding: '5px 14px', fontSize: 11 }}
+            onClick={loadTop100} disabled={top100Loading}>
+            {top100Loading ? '載入中（約15秒）...' : (top100 ? '重新載入' : '載入排行榜')}
+          </button>
+          {top100 && <span style={{ color: '#3a6080', fontSize: 11 }}>
+            {top100.period} ｜ 共{top100.total_stocks?.toLocaleString()}家參與計算
+          </span>}
+        </div>
+
+        {top100 && (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#070a0f' }}>
+                  {['排名','代號','名稱','總分','月營收年增率','毛利率','營益率','業外收支/營收','存貨狀態'].map(h => (
+                    <th key={h} style={{ padding: '6px 10px', textAlign: h==='名稱'?'left':'right',
+                      color: '#5a8aaa', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1,
+                      borderBottom: '1px solid #1a2a3c', fontWeight: 700, whiteSpace: 'nowrap',
+                      ...(h==='代號'||h==='排名'?{textAlign:'center'}:{}) }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {top100.data.map((r, i) => (
+                  <tr key={r.ticker} style={{ background: i%2===0?'#080b10':'#070a0e',
+                    borderBottom: '1px solid #090d14' }}
+                    onClick={() => { setInputTicker(r.ticker); search(r.ticker); searchGpm(r.ticker); searchOpi(r.ticker); searchNonOp(r.ticker); searchInv(r.ticker); window.scrollTo(0,0); }}
+                    onMouseEnter={e => e.currentTarget.style.background='#0d1828'}
+                    onMouseLeave={e => e.currentTarget.style.background=i%2===0?'#080b10':'#070a0e'}
+                    style={{ cursor: 'pointer', background: i%2===0?'#080b10':'#070a0e', borderBottom: '1px solid #090d14' }}>
+                    <td style={{ padding: '5px 10px', textAlign: 'center', color: i<3?'#f0c040':'#3a6080', fontFamily: "'JetBrains Mono',monospace", fontWeight: i<3?700:400 }}>
+                      {i<3 ? ['🥇','🥈','🥉'][i] : i+1}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700,
+                      background: 'linear-gradient(135deg,#70a8c8,#b0d8f0)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                      {r.ticker}
+                    </td>
+                    <td style={{ padding: '5px 10px', color: '#90b8d0', whiteSpace: 'nowrap' }}>{r.name}</td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace", fontWeight: 700,
+                      color: r.total >= 80 ? '#3ed888' : r.total >= 50 ? '#d8a840' : '#90c0dc' }}>
+                      {r.total}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.yoy >= 30 ? '#3ed888' : r.yoy >= 0 ? '#90c0dc' : '#e05050' }}>
+                      {r.yoy != null ? `${r.yoy > 0?'+':''}${r.yoy?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.gpm >= 40 ? '#3ed888' : r.gpm >= 10 ? '#90c0dc' : '#e05050' }}>
+                      {r.gpm != null ? `${r.gpm?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.opi >= 25 ? '#3ed888' : r.opi >= 0 ? '#90c0dc' : '#e05050' }}>
+                      {r.opi != null ? `${r.opi?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: Math.abs(r.nonop_ratio||0) < 3 ? '#3ed888' : Math.abs(r.nonop_ratio||0) < 7 ? '#d8a840' : '#e05050' }}>
+                      {r.nonop_ratio != null ? `${r.nonop_ratio > 0?'+':''}${r.nonop_ratio?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', whiteSpace: 'nowrap',
+                      color: r.inv_combo?.includes('↑') && r.inv_combo?.includes('↓') ? '#3ed888' : '#d8a840', fontSize: 11 }}>
+                      {r.inv_combo || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
@@ -56,6 +132,8 @@ export default function Scoreboard() {
   const [opiLoading, setOpiLoading] = useState(false);
   const [nonOpDetail, setNonOpDetail] = useState(null);
   const [invDetail, setInvDetail] = useState(null);
+  const [top100, setTop100] = useState(null);
+  const [top100Loading, setTop100Loading] = useState(false);
 
   // 統計隨查詢一起帶出
 
@@ -128,6 +206,18 @@ export default function Scoreboard() {
       const r = await fetch(`${API_URL}/api/scoreboard/inv/${tv}`);
       setInvDetail(await r.json());
     } catch(e) {}
+  };
+
+  const loadTop100 = async () => {
+    setTop100Loading(true);
+    try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 60000);
+      const r = await fetch(`${API_URL}/api/scoreboard/top100`, { signal: controller.signal });
+      clearTimeout(tid);
+      setTop100(await r.json());
+    } catch(e) { console.error(e); }
+    setTop100Loading(false);
   };
 
   const statusBadge = (status) => {
@@ -411,6 +501,82 @@ export default function Scoreboard() {
       </div>
 
 
+
+      {/* 排行榜 */}
+      <div style={S.card}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <span style={{ ...S.label, marginBottom: 0 }}>🏆 總分前100名排行榜</span>
+          <button style={{ ...S.btn, padding: '5px 14px', fontSize: 11 }}
+            onClick={loadTop100} disabled={top100Loading}>
+            {top100Loading ? '載入中（約15秒）...' : (top100 ? '重新載入' : '載入排行榜')}
+          </button>
+          {top100 && <span style={{ color: '#3a6080', fontSize: 11 }}>
+            {top100.period} ｜ 共{top100.total_stocks?.toLocaleString()}家參與計算
+          </span>}
+        </div>
+
+        {top100 && (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#070a0f' }}>
+                  {['排名','代號','名稱','總分','月營收年增率','毛利率','營益率','業外收支/營收','存貨狀態'].map(h => (
+                    <th key={h} style={{ padding: '6px 10px', textAlign: h==='名稱'?'left':'right',
+                      color: '#5a8aaa', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1,
+                      borderBottom: '1px solid #1a2a3c', fontWeight: 700, whiteSpace: 'nowrap',
+                      ...(h==='代號'||h==='排名'?{textAlign:'center'}:{}) }}>
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {top100.data.map((r, i) => (
+                  <tr key={r.ticker} style={{ background: i%2===0?'#080b10':'#070a0e',
+                    borderBottom: '1px solid #090d14' }}
+                    onClick={() => { setInputTicker(r.ticker); search(r.ticker); searchGpm(r.ticker); searchOpi(r.ticker); searchNonOp(r.ticker); searchInv(r.ticker); window.scrollTo(0,0); }}
+                    onMouseEnter={e => e.currentTarget.style.background='#0d1828'}
+                    onMouseLeave={e => e.currentTarget.style.background=i%2===0?'#080b10':'#070a0e'}
+                    style={{ cursor: 'pointer', background: i%2===0?'#080b10':'#070a0e', borderBottom: '1px solid #090d14' }}>
+                    <td style={{ padding: '5px 10px', textAlign: 'center', color: i<3?'#f0c040':'#3a6080', fontFamily: "'JetBrains Mono',monospace", fontWeight: i<3?700:400 }}>
+                      {i<3 ? ['🥇','🥈','🥉'][i] : i+1}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700,
+                      background: 'linear-gradient(135deg,#70a8c8,#b0d8f0)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>
+                      {r.ticker}
+                    </td>
+                    <td style={{ padding: '5px 10px', color: '#90b8d0', whiteSpace: 'nowrap' }}>{r.name}</td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace", fontWeight: 700,
+                      color: r.total >= 80 ? '#3ed888' : r.total >= 50 ? '#d8a840' : '#90c0dc' }}>
+                      {r.total}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.yoy >= 30 ? '#3ed888' : r.yoy >= 0 ? '#90c0dc' : '#e05050' }}>
+                      {r.yoy != null ? `${r.yoy > 0?'+':''}${r.yoy?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.gpm >= 40 ? '#3ed888' : r.gpm >= 10 ? '#90c0dc' : '#e05050' }}>
+                      {r.gpm != null ? `${r.gpm?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: r.opi >= 25 ? '#3ed888' : r.opi >= 0 ? '#90c0dc' : '#e05050' }}>
+                      {r.opi != null ? `${r.opi?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                      color: Math.abs(r.nonop_ratio||0) < 3 ? '#3ed888' : Math.abs(r.nonop_ratio||0) < 7 ? '#d8a840' : '#e05050' }}>
+                      {r.nonop_ratio != null ? `${r.nonop_ratio > 0?'+':''}${r.nonop_ratio?.toFixed(1)}%` : '-'}
+                    </td>
+                    <td style={{ padding: '5px 10px', textAlign: 'right', whiteSpace: 'nowrap',
+                      color: r.inv_combo?.includes('↑') && r.inv_combo?.includes('↓') ? '#3ed888' : '#d8a840', fontSize: 11 }}>
+                      {r.inv_combo || '-'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
