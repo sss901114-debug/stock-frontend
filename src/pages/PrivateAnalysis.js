@@ -109,22 +109,40 @@ export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
   };
 
   const runRevAnalysis = async () => {
-    if (!revData) return;
     setRevLoading(true); setRevAnalysis('');
 
-    const { qData, mData } = revData;
+    // 按下按鈕時即時抓資料，避免預載競爭問題
+    let qData = [], mData = [], name = analysisTicker;
+    try {
+      const [qRes, mRes, infoRes] = await Promise.all([
+        fetch(`${API_URL}/api/company/${analysisTicker}/quarterly?limit=9999`),
+        fetch(`${API_URL}/api/company/${analysisTicker}/monthly?limit=9999`),
+        fetch(`${API_URL}/api/company/${analysisTicker}`),
+      ]);
+      const qj = await qRes.json();
+      const mj = await mRes.json();
+      const ij = await infoRes.json();
+      if (Array.isArray(qj)) qData = qj;
+      if (Array.isArray(mj)) mData = mj;
+      if (ij && ij.name) name = ij.name;
+    } catch(e) {}
 
-    // 整理季度營收（近16季）
+    if (qData.length === 0 && mData.length === 0) {
+      setRevAnalysis('❌ 找不到資料，請確認股票代號是否正確');
+      setRevLoading(false); return;
+    }
+
+    // 整理季度營收（全部歷史，由舊到新）
     const qRevLines = qData.slice().reverse().map(q =>
       `${q['期別']}：${q['營業收入_億']}億 毛利率${q['毛利率']}% 營收年增率${q['營收年增率']}%`
     ).join('\n');
 
-    // 整理月營收（近36個月）
+    // 整理月營收（全部歷史，由舊到新）
     const mRevLines = mData.slice().reverse().map(m =>
       `${m.period}：${m.revenue ? (m.revenue/100000).toFixed(2) : '-'}億 年增率${m.yoy_pct != null ? Number(m.yoy_pct).toFixed(1) : '-'}% 月增率${m.mom_pct != null ? Number(m.mom_pct).toFixed(1) : '-'}%`
     ).join('\n');
 
-    const prompt = `請對 ${companyName}（${analysisTicker}）的營業收入進行深度分析。
+    const prompt = `請對 ${name}（${analysisTicker}）的營業收入進行深度分析。
 
 【季度營收（全部歷史資料，由舊到新）】
 ${qRevLines}
