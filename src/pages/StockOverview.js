@@ -72,7 +72,7 @@ export default function StockOverview({ ticker }) {
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
         <thead>
-          <tr style={{ background: '#1e2a3a' }}>
+          <tr style={{ background: '#070a0f' }}>
             <th style={{ ...th, textAlign: 'left', minWidth: 220 }}>項目</th>
             {qHeaders.map(h => <th key={h} style={th}>{h}</th>)}
           </tr>
@@ -101,7 +101,7 @@ export default function StockOverview({ ticker }) {
     <div style={{ overflowX: 'auto' }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
         <thead>
-          <tr style={{ background: '#1e2a3a' }}>
+          <tr style={{ background: '#070a0f' }}>
             <th style={{ ...th, textAlign: 'left', minWidth: 220 }}>項目</th>
             {aData.map(r => <th key={r.year} style={th}>{r.year}</th>)}
           </tr>
@@ -109,7 +109,7 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
                 const sepStyle = row.sep ? { borderBottom: '2px solid #ffffff' } : {};
@@ -577,7 +577,7 @@ export default function StockOverview({ ticker }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a' }}>
+            <tr style={{ background: '#070a0f' }}>
               <th style={{ ...th, textAlign: 'left', minWidth: 220 }}>項目</th>
               {mData.map(r => <th key={r.period} style={th}>{r.period}</th>)}
             </tr>
@@ -591,8 +591,8 @@ export default function StockOverview({ ticker }) {
               { label: '近3個月累計營收年增率(%)',  fn: (r) => r.cum_3m_pct != null ? Number(r.cum_3m_pct) : null, cf: colorPos },
               { label: '近12個月累計營收年增率(%)', fn: (r) => r.cum_12m_pct != null ? Number(r.cum_12m_pct) : null, cf: colorPos },
             ].map((row, ri) => (
-              <tr key={row.label} style={{ background: ri % 2 === 0 ? '#151f2e' : '#1a2535' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+              <tr key={row.label} style={{ background: ri % 2 === 0 ? '#080b10' : '#070a0e' }}>
+                <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {mData.map((r, i) => {
                   const val = row.fn(r, i);
                   const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
@@ -609,7 +609,7 @@ export default function StockOverview({ ticker }) {
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
           <thead>
-            <tr style={{ background: '#1e2a3a' }}>
+            <tr style={{ background: '#070a0f' }}>
               <th style={{ ...th, textAlign: 'left', minWidth: 220 }}>項目</th>
               {dividend.map(r => <th key={r.year} style={th}>{r.year}</th>)}
             </tr>
@@ -621,7 +621,7 @@ export default function StockOverview({ ticker }) {
               { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#f5c518', fontWeight: 600, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {dividend.map(r => (
                   <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
                 ))}
@@ -634,5 +634,5 @@ export default function StockOverview({ ticker }) {
   );
 }
 
-const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a', color: '#ddd', whiteSpace: 'nowrap', background: '#1e2a3a' };
+const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a', color: '#ddd', whiteSpace: 'nowrap', background: '#070a0f' };
 const td = { padding: '7px 12px', textAlign: 'right', borderBottom: '1px solid #1e2a3a', whiteSpace: 'nowrap' };
