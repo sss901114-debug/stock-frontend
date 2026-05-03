@@ -244,9 +244,13 @@ export default function Scoreboard() {
               ))}
             </div>
             <ScoreBar score={gpmDetail.score} />
-            <div style={{ marginTop: 6, display: 'flex', gap: 16 }}>
+            <div style={{ marginTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
               <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{gpmDetail.rank}</b> / {gpmDetail.total?.toLocaleString()}家</span>
               <span style={{ color: '#3a6080', fontSize: 11 }}>季別：{gpmDetail.period}</span>
+              {gpmDetail.stats && <>
+                <span style={{ color: '#3a6080', fontSize: 11 }}>全體：{gpmDetail.stats.total?.toLocaleString()}家</span>
+                <span style={{ color: '#3a6080', fontSize: 11 }}>極端值剔除：高{gpmDetail.stats.excluded_extreme_hi}+低{gpmDetail.stats.excluded_extreme_lo}家</span>
+              </>}
             </div>
             <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10, lineHeight: 1.6 }}>
               評分說明：&lt;10%→0分 ｜ 10%~40%→線性0~10分 ｜ ≥40%→10分 ｜ 毛利率每增加1%加0.01分（&lt;10%時加1分）
