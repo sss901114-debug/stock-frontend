@@ -51,29 +51,27 @@ export default function Scoreboard() {
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
 
-  // 載入全體統計
-  useEffect(() => {
-    fetch(`${API_URL}/api/scoreboard/monthly-rev`)
-      .then(r => r.json())
-      .then(d => setStats({
-        period: d.period,
-        total: d.total,
-        scored: d.scored,
-        excluded_low: d.excluded_low,
-        excluded_zero: d.excluded_zero,
-        excluded_extreme_hi: d.excluded_extreme_hi,
-        excluded_extreme_lo: d.excluded_extreme_lo,
-      }))
-      .catch(() => {});
-  }, []);
+  // 統計隨查詢一起帶出
 
   const search = async (t) => {
     if (!t) return;
     setLoading(true); setDetail(null);
     try {
       const r = await fetch(`${API_URL}/api/scoreboard/monthly-rev/${t}`);
-      setDetail(await r.json());
-    } catch(e) { setDetail({ error: '查詢失敗' }); }
+      const d = await r.json();
+      setDetail(d);
+      if (d.stats) {
+        setStats({
+          period: d.period,
+          total: d.stats.total,
+          scored: d.stats.scored,
+          excluded_low: d.stats.excluded_low,
+          excluded_zero: d.stats.excluded_zero,
+          excluded_extreme_hi: d.stats.excluded_extreme_hi,
+          excluded_extreme_lo: d.stats.excluded_extreme_lo,
+        });
+      }
+    } catch(e) { setDetail({ error: '查詢失敗，請稍後再試' }); }
     setLoading(false);
   };
 
@@ -140,7 +138,7 @@ export default function Scoreboard() {
             placeholder="2330" />
           <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); }}
             disabled={loading}>
-            {loading ? '查詢中...' : '查詢'}
+            {loading ? '計算中（約10秒）...' : '查詢'}
           </button>
         </div>
 
