@@ -150,33 +150,63 @@ export default function Scoreboard() {
 
       {/* 全體統計 */}
       {stats && (
-        <div style={{ ...S.card, marginBottom: 16, display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1 }}>
-          {[
-            { label: '計算月份', value: stats.period, color: '#90c0dc' },
-            { label: '全體股票數', value: stats.total?.toLocaleString(), color: '#c0d8ea' },
-            { label: '有效評分', value: stats.scored?.toLocaleString(), color: '#3ed888' },
-            { label: '剔除合計', value: (stats.excluded_low+stats.excluded_zero+stats.excluded_extreme_hi+stats.excluded_extreme_lo)?.toLocaleString(), color: '#d8a840' },
-          ].map(item => (
-            <div key={item.label} style={{ padding: '10px 14px', borderRight: '1px solid #0f1c2a' }}>
-              <div style={S.label}>{item.label}</div>
-              <div style={{ ...S.mono, fontSize: 18, fontWeight: 600, color: item.color }}>{item.value}</div>
-            </div>
-          ))}
-          <div style={{ gridColumn: '1/-1', borderTop: '1px solid #0f1c2a',
-            padding: '8px 14px', display: 'flex', gap: 24, flexWrap: 'wrap' }}>
-            <span style={{ color: '#3a6080', fontSize: 11 }}>
-              基期太低：<b style={{ color: '#6a8090' }}>{stats.excluded_low}</b> 家
-            </span>
-            <span style={{ color: '#3a6080', fontSize: 11 }}>
-              基期為零：<b style={{ color: '#6a8090' }}>{stats.excluded_zero}</b> 家
-            </span>
-            <span style={{ color: '#3a6080', fontSize: 11 }}>
-              極端值（高端）：<b style={{ color: '#6a8090' }}>{stats.excluded_extreme_hi}</b> 家
-            </span>
-            <span style={{ color: '#3a6080', fontSize: 11 }}>
-              極端值（低端）：<b style={{ color: '#6a8090' }}>{stats.excluded_extreme_lo}</b> 家
-            </span>
+        <div style={{ ...S.card, marginBottom: 16 }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 1 }}>
+            {[
+              { label: '計算月份', value: stats.period, color: '#90c0dc' },
+              { label: '全體股票數', value: stats.total?.toLocaleString(), color: '#c0d8ea' },
+              { label: '總得分（滿分120）',
+                value: (() => {
+                  const scores = [
+                    detail?.score != null ? detail.score * 4 : null,
+                    gpmDetail?.score != null ? gpmDetail.score * 2 : null,
+                    opiDetail?.score != null ? opiDetail.score * 2 : null,
+                    nonOpDetail?.score != null ? nonOpDetail.score * 1 : null,
+                    invDetail?.score != null ? invDetail.score * 1 : null,
+                  ];
+                  const valid = scores.filter(s => s !== null);
+                  if (valid.length === 0) return '-';
+                  return valid.reduce((a,b) => a+b, 0).toFixed(1);
+                })(),
+                color: (() => {
+                  const scores = [
+                    detail?.score != null ? detail.score * 4 : null,
+                    gpmDetail?.score != null ? gpmDetail.score * 2 : null,
+                    opiDetail?.score != null ? opiDetail.score * 2 : null,
+                    nonOpDetail?.score != null ? nonOpDetail.score * 1 : null,
+                    invDetail?.score != null ? invDetail.score * 1 : null,
+                  ];
+                  const valid = scores.filter(s => s !== null);
+                  if (valid.length === 0) return '#3a6080';
+                  const total = valid.reduce((a,b) => a+b, 0);
+                  return total >= 80 ? '#3ed888' : total >= 50 ? '#d8a840' : '#e05050';
+                })()
+              },
+            ].map(item => (
+              <div key={item.label} style={{ padding: '10px 14px', borderRight: '1px solid #0f1c2a' }}>
+                <div style={S.label}>{item.label}</div>
+                <div style={{ ...S.mono, fontSize: 20, fontWeight: 700, color: item.color }}>{item.value}</div>
+              </div>
+            ))}
           </div>
+          {(detail || gpmDetail || opiDetail || nonOpDetail || invDetail) && (
+            <div style={{ borderTop: '1px solid #0f1c2a', padding: '8px 14px',
+              display: 'flex', gap: 20, flexWrap: 'wrap', fontSize: 11 }}>
+              {[
+                { label: '月營收×4', score: detail?.score, mult: 4 },
+                { label: '毛利率×2', score: gpmDetail?.score, mult: 2 },
+                { label: '營益率×2', score: opiDetail?.score, mult: 2 },
+                { label: '業外收支×1', score: nonOpDetail?.score, mult: 1 },
+                { label: '存貨×1', score: invDetail?.score, mult: 1 },
+              ].map(item => (
+                <span key={item.label} style={{ color: '#3a6080' }}>
+                  {item.label}：<b style={{ color: item.score != null ? '#90c0dc' : '#2a4060', fontFamily: "'JetBrains Mono',monospace" }}>
+                    {item.score != null ? (item.score * item.mult).toFixed(1) : '-'}
+                  </b>
+                </span>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
