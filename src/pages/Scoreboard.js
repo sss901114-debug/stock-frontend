@@ -192,7 +192,7 @@ export default function Scoreboard() {
                   <div style={S.label}>月營收年增率得分</div>
                   <ScoreBar score={detail.score} />
                   <div style={{ marginTop: 10, color: '#3a6080', fontSize: 11, lineHeight: 1.6 }}>
-                    評分說明：-10分（年增率≤-50%）→ 0分（-20%）→ 10分（≥100%）
+                    評分說明：0分（年增率≤-30%）→ 7分（+30%）→ 10分（≥100%）
                     {detail.status === 'scored_over200' && (
                       <span style={{ color: '#d8a840' }}>
                         {detail.consec_over200 ? '　連續2個月>200%，給滿分10分' : '　單月>200%，給5分（半滿）'}
@@ -215,12 +215,12 @@ export default function Scoreboard() {
         <div style={{ ...S.label, marginBottom: 10 }}>評分規則 — 月營收年增率</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
           {[
-            { range: '年增率 ≥ 100%', score: '10 分', color: '#3ed888' },
-            { range: '年增率 -20% ~ 100%', score: '線性 0 ~ 10 分', color: '#90c0dc' },
-            { range: '年增率 -20% ~ -50%', score: '線性 0 ~ -10 分', color: '#d8a840' },
-            { range: '年增率 ≤ -50%', score: '-10 分', color: '#e05050' },
-            { range: '連續 2 個月 > 200%', score: '10 分（滿分）', color: '#3ed888' },
-            { range: '單月 > 200%', score: '5 分（半滿）', color: '#90c0dc' },
+            { range: '年增率 100% ~ 200%', score: '10 分', color: '#3ed888' },
+            { range: '年增率 30% ~ 100%', score: '線性 7 ~ 10 分', color: '#3ed888' },
+            { range: '年增率 -30% ~ 30%', score: '線性 0 ~ 7 分', color: '#90c0dc' },
+            { range: '年增率 ≤ -30%', score: '0 分', color: '#d8a840' },
+            { range: '連續 2 個月 ≥ 200%', score: '10 分（滿分）', color: '#3ed888' },
+            { range: '單月 ≥ 200%', score: '5 分（半滿）', color: '#90c0dc' },
             { range: '本月或去年同月 < 3000萬', score: '🔘 基期太低，不評', color: '#3a6080' },
             { range: '極端值（各1.5%）', score: '⚠️ 剔除，不評', color: '#d8a840' },
           ].map((r, i) => (
