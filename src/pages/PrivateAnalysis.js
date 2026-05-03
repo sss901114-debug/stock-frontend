@@ -70,6 +70,44 @@ export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
     } catch(e) { setRevData(null); }
   };
 
+  const fetchStats = async (t) => {
+    setStatsLoading(true); setStats(null); setAiInterpret('');
+    try {
+      const r = await fetch(`${API_URL}/api/company/${t}/radar-stats`);
+      const d = await r.json();
+      setStats(d);
+    } catch(e) { setStats({error: '載入失敗'}); }
+    setStatsLoading(false);
+  };
+
+  const interpretStats = async () => {
+    if (!stats) return;
+    setAiInterpretLoading(true); setAiInterpret('');
+    const s = stats;
+    const prompt = `請解讀以下${companyName}（${analysisTicker}）的財務統計分析，用繁體中文，具體說明投資意義：
+
+1. 營收 vs 毛利率相關係數：r=${s.rev_gp_corr?.r}
+2. 營收 vs 存貨：最佳落後${s.rev_inv_lag?.best_lag}季，r=${s.rev_inv_lag?.lags?.[s.rev_inv_lag?.best_lag]?.r}
+3. 營收 vs 購置不動產設備：最佳落後${s.rev_capex_lag?.best_lag}季，r=${s.rev_capex_lag?.lags?.[s.rev_capex_lag?.best_lag]?.r}
+4. 營收 vs 無形資產：最佳落後${s.rev_intg_lag?.best_lag}季，r=${s.rev_intg_lag?.lags?.[s.rev_intg_lag?.best_lag]?.r}
+5. 營收 vs 合約負債：最佳落後${s.rev_cl_lag?.best_lag}季，r=${s.rev_cl_lag?.lags?.[s.rev_cl_lag?.best_lag]?.r}
+6. 原料r=${s.rev_raw_material_corr?.r}，在製品r=${s.rev_wip_corr?.r}，製成品r=${s.rev_finished_goods_corr?.r}
+7. 信號（存貨增+AR天數降→下季營收增）命中率：${s.inv_ar_signal?.hit_rate}%（${s.inv_ar_signal?.signals}次信號中${s.inv_ar_signal?.correct}次正確）
+
+資料期間：${s.start}～${s.end}，共${s.periods}季
+
+請針對每一項給出清晰的投資啟示，尤其是落後期和信號命中率的實際應用價值。`;
+    try {
+      const r = await fetch(`${API_URL}/api/private-ai-query`, {
+        method: 'POST', headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ prompt, pw: PASSWORD })
+      });
+      const d = await r.json();
+      setAiInterpret(d.result || '');
+    } catch(e) { setAiInterpret('❌ 失敗'); }
+    setAiInterpretLoading(false);
+  };
+
   const runRevAnalysis = async () => {
     if (!revData) return;
     setRevLoading(true); setRevAnalysis('');
