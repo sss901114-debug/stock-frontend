@@ -5,10 +5,10 @@ const PASSWORD = 'sss901114';
 
 const S = {
   sec: { background: '#080b10', border: '1px solid #1a2a3c', marginBottom: 1, padding: '16px 20px' },
-  label: { color: '#6a98b8', fontSize: 10, letterSpacing: 3, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 8, display: 'block' },
+  label: { color: '#90c0dc', fontSize: 10, letterSpacing: 3, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 8, display: 'block' },
   input: { width: '100%', background: '#060910', border: '1px solid #2a5070', padding: '8px 12px', color: '#c0d8ea', fontSize: 13, outline: 'none', fontFamily: "'Barlow',sans-serif", marginBottom: 8 },
   btn: (bg='#2e5872') => ({ padding: '7px 18px', background: `linear-gradient(135deg,${bg},${bg}bb)`, color: '#eef8ff', border: 'none', cursor: 'pointer', fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, fontSize: 12, letterSpacing: 2, marginRight: 8 }),
-  title: { fontFamily: "'Rajdhani',sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 2, color: '#6a98b8', marginBottom: 10 },
+  title: { fontFamily: "'Rajdhani',sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: 2, color: '#90c0dc', marginBottom: 10 },
 };
 
 export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
@@ -203,7 +203,7 @@ ${mRevLines}
         <div style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 18, fontWeight: 700, letterSpacing: 3, color: '#90c0dc', marginBottom: 24, textAlign: 'center' }}>
           📡 財報雷達站
         </div>
-        <div style={{ color: '#3a6080', fontSize: 10, letterSpacing: 2, marginBottom: 6, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700 }}>PASSWORD</div>
+        <div style={{ color: '#7ab0cc', fontSize: 10, letterSpacing: 2, marginBottom: 6, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700 }}>PASSWORD</div>
         <input type="password" value={pw} onChange={e => setPw(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') { if (pw === PASSWORD) { setAuthed(true); setPwErr(''); } else setPwErr('密碼錯誤'); }}}
           style={{ ...S.input, letterSpacing: 4, fontSize: 16 }} placeholder="••••••••" />
@@ -239,7 +239,7 @@ ${mRevLines}
         </div>
 
         {revLoading && (
-          <div style={{ color: '#3a6080', fontSize: 12, padding: '12px 0', letterSpacing: 2 }}>
+          <div style={{ color: '#7ab0cc', fontSize: 12, padding: '12px 0', letterSpacing: 2 }}>
             ⏳ 正在分析淡旺季與景氣循環...
           </div>
         )}
@@ -268,7 +268,7 @@ ${mRevLines}
 
         {stats && !stats.error && (
           <div>
-            <div style={{ color: '#3a6080', fontSize: 10, marginBottom: 12 }}>
+            <div style={{ color: '#7ab0cc', fontSize: 10, marginBottom: 12 }}>
               資料期間：{stats.start} ～ {stats.end}（共 {stats.periods} 季）
             </div>
 
@@ -277,7 +277,7 @@ ${mRevLines}
               <thead>
                 <tr style={{ background: '#070a0f' }}>
                   {['分析項目','相關係數 r','顯著性 p','解讀'].map(h =>
-                    <th key={h} style={{ padding: '5px 10px', textAlign: 'left', color: '#3a6080', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1, borderBottom: '1px solid #1a2a3c', fontWeight: 600 }}>{h}</th>
+                    <th key={h} style={{ padding: '5px 10px', textAlign: 'left', color: '#7ab0cc', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1, borderBottom: '1px solid #1a2a3c', fontWeight: 600 }}>{h}</th>
                   )}
                 </tr>
               </thead>
@@ -303,7 +303,7 @@ ${mRevLines}
             </table>
 
             {/* 落後關係 */}
-            <div style={{ color: '#6a98b8', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>落後關係（N季後反映在營收）</div>
+            <div style={{ color: '#90c0dc', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>落後關係（N季後反映在營收）</div>
             {[stats.rev_inv_lag, stats.rev_capex_lag, stats.rev_intg_lag, stats.rev_cl_lag].filter(Boolean).map((item, i) => {
               const best = item.lags[item.best_lag];
               return (
@@ -329,7 +329,7 @@ ${mRevLines}
             {/* 信號分析 */}
             {stats.inv_ar_signal && (
               <div style={{ padding: '10px 14px', background: '#070a0f', border: '1px solid #0d1820', marginTop: 8 }}>
-                <div style={{ color: '#6a98b8', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>信號分析：{stats.inv_ar_signal.label}</div>
+                <div style={{ color: '#90c0dc', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>信號分析：{stats.inv_ar_signal.label}</div>
                 <div style={{ display: 'flex', gap: 20 }}>
                   <span style={{ color: '#8ab0cc', fontSize: 12 }}>歷史信號次數：<b style={{ color: '#c0d8ea' }}>{stats.inv_ar_signal.signals}次</b></span>
                   <span style={{ color: '#8ab0cc', fontSize: 12 }}>命中次數：<b style={{ color: '#3ed888' }}>{stats.inv_ar_signal.correct}次</b></span>
