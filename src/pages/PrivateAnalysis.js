@@ -22,6 +22,10 @@ export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
 
   // 營收分析
   const [revAnalysis, setRevAnalysis] = useState('');
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [aiInterpret, setAiInterpret] = useState('');
+  const [aiInterpretLoading, setAiInterpretLoading] = useState(false);
   const [revLoading, setRevLoading] = useState(false);
   const [revData, setRevData] = useState(null);
 
@@ -209,6 +213,104 @@ ${mRevLines}
         )}
       </div>
 
+
+      {/* ── 2. 統計相關分析 ── */}
+      <div style={S.sec}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 12 }}>
+          <span style={{ ...S.label, marginBottom: 0 }}>📐 二、財務指標統計分析</span>
+          <button style={S.btn()} onClick={() => fetchStats(analysisTicker)} disabled={statsLoading}>
+            {statsLoading ? '計算中...' : '開始計算'}
+          </button>
+          {stats && !stats.error && (
+            <button style={S.btn('#1e4a3a')} onClick={interpretStats} disabled={aiInterpretLoading}>
+              {aiInterpretLoading ? 'AI解讀中...' : '🤖 AI解讀'}
+            </button>
+          )}
+        </div>
+
+        {stats && !stats.error && (
+          <div>
+            <div style={{ color: '#3a6080', fontSize: 10, marginBottom: 12 }}>
+              資料期間：{stats.start} ～ {stats.end}（共 {stats.periods} 季）
+            </div>
+
+            {/* 相關係數表 */}
+            <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: 12, fontSize: 12 }}>
+              <thead>
+                <tr style={{ background: '#070a0f' }}>
+                  {['分析項目','相關係數 r','顯著性 p','解讀'].map(h =>
+                    <th key={h} style={{ padding: '5px 10px', textAlign: 'left', color: '#3a6080', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1, borderBottom: '1px solid #1a2a3c', fontWeight: 600 }}>{h}</th>
+                  )}
+                </tr>
+              </thead>
+              <tbody>
+                {[
+                  stats.rev_gp_corr,
+                  stats.rev_raw_material_corr,
+                  stats.rev_wip_corr,
+                  stats.rev_finished_goods_corr,
+                ].filter(Boolean).map((item, i) => {
+                  const r = item.r;
+                  const level = Math.abs(r) > 0.7 ? {label:'高度相關',color:'#3ed888'} : Math.abs(r) > 0.4 ? {label:'中度相關',color:'#d8a840'} : {label:'低度相關',color:'#6a8090'};
+                  return (
+                    <tr key={i} style={{ background: i%2===0?'#080b10':'#070a0e', borderBottom: '1px solid #0d1820' }}>
+                      <td style={{ padding: '5px 10px', color: '#8ab0cc' }}>{item.label}</td>
+                      <td style={{ padding: '5px 10px', color: r > 0 ? '#3ed888' : '#e05050', fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{r}</td>
+                      <td style={{ padding: '5px 10px', color: item.p < 0.05 ? '#3ed888' : '#6a8090', fontFamily: "'JetBrains Mono',monospace" }}>{item.p < 0.05 ? '★顯著' : item.p}</td>
+                      <td style={{ padding: '5px 10px', color: level.color }}>{level.label}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+
+            {/* 落後關係 */}
+            <div style={{ color: '#6a98b8', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>落後關係（N季後反映在營收）</div>
+            {[stats.rev_inv_lag, stats.rev_capex_lag, stats.rev_intg_lag, stats.rev_cl_lag].filter(Boolean).map((item, i) => {
+              const best = item.lags[item.best_lag];
+              return (
+                <div key={i} style={{ marginBottom: 8, padding: '8px 12px', background: '#070a0f', border: '1px solid #0d1820' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ color: '#8ab0cc', fontSize: 12 }}>{item.label}</span>
+                    <span style={{ color: '#d8a840', fontSize: 11, fontFamily: "'JetBrains Mono',monospace" }}>
+                      最佳落後：{item.best_lag}季 (r={best?.r})
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
+                    {Object.entries(item.lags).map(([lag, v]) => (
+                      <span key={lag} style={{ fontSize: 10, color: lag==item.best_lag?'#d8a840':'#3a6080',
+                        background: lag==item.best_lag?'#1e2a0a':'#0a0d12', padding: '2px 8px' }}>
+                        {lag}季落後: r={v.r}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* 信號分析 */}
+            {stats.inv_ar_signal && (
+              <div style={{ padding: '10px 14px', background: '#070a0f', border: '1px solid #0d1820', marginTop: 8 }}>
+                <div style={{ color: '#6a98b8', fontSize: 10, letterSpacing: 2, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginBottom: 6 }}>信號分析：{stats.inv_ar_signal.label}</div>
+                <div style={{ display: 'flex', gap: 20 }}>
+                  <span style={{ color: '#8ab0cc', fontSize: 12 }}>歷史信號次數：<b style={{ color: '#c0d8ea' }}>{stats.inv_ar_signal.signals}次</b></span>
+                  <span style={{ color: '#8ab0cc', fontSize: 12 }}>命中次數：<b style={{ color: '#3ed888' }}>{stats.inv_ar_signal.correct}次</b></span>
+                  <span style={{ color: '#8ab0cc', fontSize: 12 }}>命中率：<b style={{ color: stats.inv_ar_signal.hit_rate >= 60 ? '#3ed888' : '#d8a840', fontSize: 16 }}>{stats.inv_ar_signal.hit_rate}%</b></span>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {stats?.error && <div style={{ color: '#e05050', fontSize: 12 }}>❌ {stats.error}</div>}
+
+        {/* AI 解讀 */}
+        {aiInterpret && (
+          <div style={{ marginTop: 14, color: '#a8c8e0', fontSize: 14, lineHeight: 2.0, whiteSpace: 'pre-wrap', borderTop: '1px solid #1a2a3c', paddingTop: 14 }}>
+            {aiInterpret}
+          </div>
+        )}
+      </div>
 
     </div>
   );
