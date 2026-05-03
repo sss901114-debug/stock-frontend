@@ -45,7 +45,7 @@ const ScoreBar = ({ score }) => {
 };
 
 export default function Scoreboard() {
-  const [inputTicker, setInputTicker] = useState('');
+  const [inputTicker, setInputTicker] = useState('2330');
   const [ticker, setTicker] = useState('');
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -54,10 +54,16 @@ export default function Scoreboard() {
   // 統計隨查詢一起帶出
 
   const search = async (t) => {
-    if (!t) return;
+    const ticker_val = (t || inputTicker || '').trim();
+    if (!ticker_val) { alert('請輸入股票代號'); return; }
+    const t_use = ticker_val;
+    if (!t) t = t_use;
     setLoading(true); setDetail(null);
     try {
-      const r = await fetch(`${API_URL}/api/scoreboard/monthly-rev/${t}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
+      const r = await fetch(`${API_URL}/api/scoreboard/monthly-rev/${ticker_val}`, { signal: controller.signal });
+      clearTimeout(timeoutId);
       const d = await r.json();
       setDetail(d);
       if (d.stats) {
@@ -71,7 +77,7 @@ export default function Scoreboard() {
           excluded_extreme_lo: d.stats.excluded_extreme_lo,
         });
       }
-    } catch(e) { setDetail({ error: '查詢失敗，請稍後再試' }); }
+    } catch(e) { setDetail({ error: `查詢失敗：${e.message}` }); }
     setLoading(false);
   };
 
