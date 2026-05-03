@@ -54,8 +54,8 @@ export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
   const fetchRevData = async (t) => {
     try {
       const [qRes, mRes, infoRes] = await Promise.all([
-        fetch(`${API_URL}/api/company/${t}/quarterly`),
-        fetch(`${API_URL}/api/company/${t}/monthly`),
+        fetch(`${API_URL}/api/company/${t}/quarterly?limit=9999`),
+        fetch(`${API_URL}/api/company/${t}/monthly?limit=9999`),
         fetch(`${API_URL}/api/company/${t}/info`),
       ]);
       const qData = await qRes.json();
@@ -73,30 +73,30 @@ export default function PrivateAnalysis({ ticker: globalTicker = '2330' }) {
     const { qData, mData } = revData;
 
     // 整理季度營收（近16季）
-    const qRevLines = qData.slice(0, 16).map(q =>
+    const qRevLines = qData.slice().reverse().map(q =>
       `${q['期別']}：${q['營業收入_億']}億 毛利率${q['毛利率']}% 營收年增率${q['營收年增率']}%`
     ).join('\n');
 
     // 整理月營收（近36個月）
-    const mRevLines = mData.slice(0, 36).map(m =>
+    const mRevLines = mData.slice().reverse().map(m =>
       `${m.period}：${m.revenue ? (m.revenue/100000).toFixed(2) : '-'}億 年增率${m.yoy_pct != null ? Number(m.yoy_pct).toFixed(1) : '-'}% 月增率${m.mom_pct != null ? Number(m.mom_pct).toFixed(1) : '-'}%`
     ).join('\n');
 
     const prompt = `請對 ${companyName}（${analysisTicker}）的營業收入進行深度分析。
 
-【季度營收（近16季，由新到舊）】
+【季度營收（全部歷史資料，由舊到新）】
 ${qRevLines}
 
-【月營收（近36個月，由新到舊）】
+【月營收（全部歷史資料，由舊到新）】
 ${mRevLines}
 
-請從以下三個面向分析，每個面向150字，具體引用數字：
+資料涵蓋完整歷史（從最早有資料的年月起），樣本數足夠分析完整景氣循環。請從以下三個面向分析，每個面向200字，具體引用年份與數字：
 
 一、淡旺季規律
 分析每年哪幾個月/哪一季是旺季、哪幾個月/季是淡季，並說明規律是否穩定，有無近年變化。
 
 二、景氣循環（擴張與收縮）
-從年增率的高低變化，找出近年景氣擴張期（年增率持續正成長）和收縮期（年增率持續負成長或下滑）的起訖時間，並分析目前處於哪個階段。
+從完整歷史年增率的變化，找出每一輪景氣擴張期（年增率持續正成長）和收縮期（年增率持續負成長或下滑）的起訖時間與持續長度，歸納出這家公司歷次景氣循環的規律，並判斷目前處於哪個階段、已持續多久、距離上一次轉折約多少個月。
 
 三、近期趨勢判斷
 綜合近3～6個月的月營收和近2～4季的季營收，判斷目前是加速成長、趨緩、還是轉折向上/向下，給出明確判斷。`;
