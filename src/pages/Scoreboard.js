@@ -301,7 +301,7 @@ export default function Scoreboard() {
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
                 <tr style={{ background: '#070a0f' }}>
-                  {['排名','代號','名稱','總分','月營收年增率','毛利率','營益率','業外收支/營收','存貨狀態'].map(h => (
+                  {['排名','代號','名稱','總分','月營收年增率','毛利率','營益率','業外收支/營收','存貨↕ 週轉↕'].map(h => (
                     <th key={h} style={{ padding: '6px 10px', textAlign: ['名稱'].includes(h)?'left':'center',
                       color: '#6a98b8', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1,
                       borderBottom: '1px solid #1a2a3c', fontWeight: 700, whiteSpace: 'nowrap' }}>
@@ -347,14 +347,77 @@ export default function Scoreboard() {
                       color: Math.abs(r.nonop_ratio||0) < 3 ? '#3ed888' : Math.abs(r.nonop_ratio||0) < 7 ? '#d8a840' : '#e05050' }}>
                       {r.nonop_ratio != null ? `${r.nonop_ratio>0?'+':''}${r.nonop_ratio?.toFixed(1)}%` : '-'}
                     </td>
-                    <td style={{ padding: '5px 10px', textAlign: 'center', whiteSpace: 'nowrap', fontSize: 11,
-                      color: r.inv_combo?.includes('↑') && r.inv_combo?.includes('↓') ? '#3ed888' : '#d8a840' }}>
-                      {r.inv_combo || '-'}
+                    <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'JetBrains Mono',monospace", fontSize: 13 }}>
+                      <span style={{ color: r.inv_up ? '#3ed888' : '#e05050' }}>{r.inv_up ? '↑' : '↓'}</span>
+                      <span style={{ color: '#3a6080', margin: '0 2px' }}>/</span>
+                      <span style={{ color: r.days_down ? '#3ed888' : '#e05050' }}>{r.days_down ? '↓' : '↑'}</span>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* 後100名 */}
+        {top100?.bottom100 && (
+          <div style={{ marginTop: 16 }}>
+            <div style={{ ...S.label, marginBottom: 8, color: '#e05050' }}>⚠️ 總分後100名</div>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr style={{ background: '#070a0f' }}>
+                    {['排名','代號','名稱','總分','月營收年增率','毛利率','營益率','業外收支/營收','存貨↕ 週轉↕'].map(h => (
+                      <th key={h} style={{ padding: '6px 10px', textAlign: ['名稱'].includes(h)?'left':'center',
+                        color: '#6a98b8', fontFamily: "'Rajdhani',sans-serif", letterSpacing: 1,
+                        borderBottom: '1px solid #1a2a3c', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {top100.bottom100.map((r, i) => {
+                    const rank = top100.total_stocks - i;
+                    return (
+                      <tr key={r.ticker}
+                        onClick={() => { setInputTicker(r.ticker); searchAll(r.ticker); window.scrollTo(0,300); }}
+                        style={{ cursor: 'pointer', background: i%2===0?'#0e0808':'#0d0707', borderBottom: '1px solid #090d14' }}
+                        onMouseEnter={e => e.currentTarget.style.background='#1a1010'}
+                        onMouseLeave={e => e.currentTarget.style.background=i%2===0?'#0e0808':'#0d0707'}>
+                        <td style={{ padding: '5px 10px', textAlign: 'center', color: '#4a3030', fontFamily: "'JetBrains Mono',monospace" }}>{rank}</td>
+                        <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'Rajdhani',sans-serif",
+                          fontWeight: 700, color: '#c89080' }}>{r.ticker}</td>
+                        <td style={{ padding: '5px 10px', color: '#7a6060', whiteSpace: 'nowrap' }}>{r.name}</td>
+                        <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'JetBrains Mono',monospace",
+                          fontWeight: 700, color: '#e05050' }}>{r.total}</td>
+                        <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                          color: r.yoy >= 0 ? '#6a9080' : '#e05050' }}>
+                          {r.yoy != null ? `${r.yoy>0?'+':''}${r.yoy?.toFixed(1)}%` : '-'}
+                        </td>
+                        <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                          color: r.gpm >= 10 ? '#6a9080' : '#e05050' }}>
+                          {r.gpm != null ? `${r.gpm?.toFixed(1)}%` : '-'}
+                        </td>
+                        <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                          color: r.opi >= 0 ? '#6a9080' : '#e05050' }}>
+                          {r.opi != null ? `${r.opi?.toFixed(1)}%` : '-'}
+                        </td>
+                        <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
+                          color: Math.abs(r.nonop_ratio||0) < 7 ? '#6a9080' : '#e05050' }}>
+                          {r.nonop_ratio != null ? `${r.nonop_ratio>0?'+':''}${r.nonop_ratio?.toFixed(1)}%` : '-'}
+                        </td>
+                        <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'JetBrains Mono',monospace", fontSize: 13 }}>
+                          <span style={{ color: r.inv_up ? '#3ed888' : '#e05050' }}>{r.inv_up != null ? (r.inv_up ? '↑' : '↓') : '-'}</span>
+                          {r.inv_up != null && <><span style={{ color: '#3a6080', margin: '0 2px' }}>/</span>
+                          <span style={{ color: r.days_down ? '#3ed888' : '#e05050' }}>{r.days_down ? '↓' : '↑'}</span></>}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </div>
