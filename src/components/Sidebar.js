@@ -2,14 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { getCompanies } from '../api';
 import './Sidebar.css';
 
+const API_URL = process.env.REACT_APP_API_URL || 'https://stock-api-production-913a.up.railway.app';
+
 export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchlist, onLogoClick }) {
   const [companies, setCompanies] = useState([]);
   const [search, setSearch] = useState('');
   const [results, setResults] = useState([]);
   const [wlOpen, setWlOpen] = useState(false);
+  const [pgGroups, setPgGroups] = useState([]);
+  const [activePg, setActivePg] = useState(null);
+  const [pgStocks, setPgStocks] = useState([]);
 
   useEffect(() => {
     getCompanies().then(setCompanies);
+    fetch(`${API_URL}/api/portfolio-groups`)
+      .then(r => r.json()).then(setPgGroups).catch(() => {});
   }, []);
 
   useEffect(() => {
@@ -20,7 +27,6 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
     ).slice(0, 8));
   }, [search, companies]);
 
-  // Enter 鍵直接選第一筆，或精確比對代號
   const handleKeyDown = (e) => {
     if (e.key !== 'Enter') return;
     const exact = companies.find(c => c.ticker === search.trim());
@@ -28,16 +34,25 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
     if (target) { setTicker(target.ticker); setSearch(''); setResults([]); }
   };
 
+  const selectPg = (g) => {
+    if (activePg === g.group_no) { setActivePg(null); setPgStocks([]); return; }
+    setActivePg(g.group_no);
+    fetch(`${API_URL}/api/portfolio-groups/${g.group_no}/stocks`)
+      .then(r => r.json()).then(setPgStocks).catch(() => setPgStocks([]));
+  };
+
   return (
     <aside className="sidebar">
-      <div className="sidebar-header" onClick={onLogoClick} style={{ cursor: 'default', userSelect: 'none' }}>
+      {/* LOGO 區 */}
+      <div className="sidebar-header" onClick={onLogoClick}>
         <span className="sidebar-logo">📈</span>
-        <span className="sidebar-title" style={{ lineHeight: 1.3, fontSize: 13 }}>
-          AI WINTIME<br/>
-          <span style={{ fontSize: 11, color: '#7abcd4' }}>台股財務健診系統</span>
-        </span>
+        <div className="sidebar-title-block">
+          <div className="sidebar-title-main">AI WINTIME</div>
+          <div className="sidebar-title-sub">台股財務健診系統</div>
+        </div>
       </div>
 
+      {/* 搜尋區 */}
       <div className="sidebar-section">
         <div className="sidebar-label">🔍 選擇股票</div>
         <div className="search-box">
@@ -59,38 +74,64 @@ export default function Sidebar({ ticker, setTicker, watchlist, removeFromWatchl
             </div>
           )}
         </div>
-        {/* 目前股票做成可點擊按鈕 */}
-        <div className="current-stock" onClick={() => setTicker(ticker)}
-          style={{ cursor: 'pointer', borderRadius: 6, padding: '6px 10px',
-            background: '#1e3a5a', border: '1px solid #4C9BB8', marginTop: 4,
-            display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div className="current-stock" onClick={() => setTicker(ticker)}>
           <span>{companies.find(c => c.ticker === ticker)?.name || ticker}</span>
-          <span className="current-ticker" style={{ background: '#4C9BB8', color: '#fff',
-            padding: '2px 7px', borderRadius: 4, fontSize: 12 }}>{ticker}</span>
+          <span className="current-ticker">{ticker}</span>
         </div>
       </div>
 
+      {/* 私房股群組 */}
       <div className="sidebar-section">
-        <div className="sidebar-label" style={{ cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+        <div className="sidebar-label">⭐ 私房股 ({watchlist.length}/30)</div>
+
+        {/* 群組下拉按鈕 */}
+        {pgGroups.length > 0 && (
+          <div className="pg-groups">
+            {pgGroups.map(g => (
+              <div key={g.group_no}>
+                <div className={`pg-btn ${activePg === g.group_no ? 'active' : ''}`}
+                  onClick={() => selectPg(g)}>
+                  <span>{g.group_name || `私房股${g.group_no}`}</span>
+                  <span className="pg-arrow">{activePg === g.group_no ? '▲' : '▼'}</span>
+                </div>
+                {activePg === g.group_no && (
+                  <div className="pg-stocks">
+                    {pgStocks.length === 0
+                      ? <div className="empty-list">尚無股票</div>
+                      : pgStocks.map(s => (
+                        <div key={s.ticker} className="watchlist-item"
+                          onClick={() => setTicker(s.ticker)}>
+                          <span className="search-ticker">{s.ticker}</span>
+                          <span className="wl-name">{s.name}</span>
+                        </div>
+                      ))}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* 追蹤清單 */}
+        <div className="pg-btn" style={{ marginTop: 4 }}
           onClick={() => setWlOpen(o => !o)}>
-          <span>⭐ 私房股 ({watchlist.length}/30)</span>
-          <span style={{ fontSize: 11, color: '#aaa' }}>{wlOpen ? '▲' : '▼'}</span>
+          <span>追蹤清單</span>
+          <span className="pg-arrow">{wlOpen ? '▲' : '▼'}</span>
         </div>
         {wlOpen && (
-          <div style={{ marginTop: 4, background: '#0d1a2a', borderRadius: 6, overflow: 'hidden' }}>
+          <div className="pg-stocks">
             {watchlist.length === 0
               ? <div className="empty-list">尚無追蹤</div>
               : watchlist.map(w => (
-                <div key={w.ticker} className="watchlist-item" style={{ display: 'flex', alignItems: 'center' }}>
-                  <span onClick={() => setTicker(w.ticker)} style={{ cursor: 'pointer', flex: 1 }}>
-                    <span>{w.ticker}</span>
+                <div key={w.ticker} className="watchlist-item">
+                  <span onClick={() => setTicker(w.ticker)} style={{ flex: 1, display: 'flex', gap: 6, cursor: 'pointer' }}>
+                    <span className="search-ticker">{w.ticker}</span>
                     <span className="wl-name">{w.name}</span>
                   </span>
                   <span onClick={() => removeFromWatchlist(w.ticker)}
-                    style={{ cursor: 'pointer', color: '#e05c5c', marginLeft: 6, fontSize: 14, lineHeight: 1 }}>✕</span>
+                    style={{ color: '#e05050', cursor: 'pointer', fontSize: 13 }}>✕</span>
                 </div>
-              ))
-            }
+              ))}
           </div>
         )}
       </div>
