@@ -49,7 +49,7 @@
 .sidebar-title-main {
   font-family: 'Rajdhani', sans-serif;
   font-weight: 800;
-  font-size: 17px;
+  font-size: 20px;
   letter-spacing: 3px;
   line-height: 1.1;
   /* 立體冷光效果 */
@@ -64,9 +64,9 @@
 .sidebar-title-sub {
   font-family: 'Rajdhani', sans-serif;
   font-weight: 700;
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 2px;
-  color: #5090b8;
+  color: #90c8e0;
   margin-top: 2px;
   text-shadow: 0 0 8px rgba(80,160,200,0.6);
 }
