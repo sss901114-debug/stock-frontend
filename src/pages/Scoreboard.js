@@ -6,7 +6,7 @@ const S = {
   root: { padding: '16px 20px', maxWidth: 900, fontFamily: "'Barlow',sans-serif" },
   header: { fontFamily: "'Rajdhani',sans-serif", fontSize: 22, fontWeight: 700,
     letterSpacing: 3, color: '#90c0dc', marginBottom: 4 },
-  sub: { color: '#3a6080', fontSize: 11, letterSpacing: 2, marginBottom: 20,
+  sub: { color: '#7ab0cc', fontSize: 11, letterSpacing: 2, marginBottom: 20,
     fontFamily: "'Rajdhani',sans-serif" },
   card: { background: '#080b10', border: '1px solid #1a2a3c', padding: '16px 20px', marginBottom: 1 },
   label: { color: '#6a98b8', fontSize: 9, letterSpacing: 2.5,
@@ -238,7 +238,7 @@ export default function Scoreboard() {
                 {detail.ticker}
               </span>
               <span style={{ color: '#8ab0c8', fontSize: 15 }}>{detail.name}</span>
-              <span style={{ color: '#3a6080', fontSize: 11, fontFamily: "'JetBrains Mono',monospace" }}>
+              <span style={{ color: '#7ab0cc', fontSize: 11, fontFamily: "'JetBrains Mono',monospace" }}>
                 {detail.period}
               </span>
             </div>
@@ -270,7 +270,7 @@ export default function Scoreboard() {
                 <div style={{ padding: '14px 16px', background: '#070a0f', border: '1px solid #0f1c2a' }}>
                   <div style={S.label}>月營收年增率得分</div>
                   <ScoreBar score={detail.score} />
-                  <div style={{ marginTop: 10, color: '#3a6080', fontSize: 11, lineHeight: 1.6 }}>
+                  <div style={{ marginTop: 10, color: '#7ab0cc', fontSize: 11, lineHeight: 1.6 }}>
                     評分說明：0分（年增率≤-30%）→ 7分（+30%）→ 10分（≥100%）
                     {detail.status === 'scored_over200' && (
                       <span style={{ color: '#d8a840' }}>
@@ -308,14 +308,14 @@ export default function Scoreboard() {
             </div>
             <ScoreBar score={gpmDetail.score} />
             <div style={{ marginTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{gpmDetail.rank}</b> / {gpmDetail.total?.toLocaleString()}家</span>
-              <span style={{ color: '#3a6080', fontSize: 11 }}>季別：{gpmDetail.period}</span>
+              <span style={{ color: '#7ab0cc', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{gpmDetail.rank}</b> / {gpmDetail.total?.toLocaleString()}家</span>
+              <span style={{ color: '#7ab0cc', fontSize: 11 }}>季別：{gpmDetail.period}</span>
               {gpmDetail.stats && <>
-                <span style={{ color: '#3a6080', fontSize: 11 }}>全體：{gpmDetail.stats.total?.toLocaleString()}家</span>
-                <span style={{ color: '#3a6080', fontSize: 11 }}>極端值剔除：高{gpmDetail.stats.excluded_extreme_hi}+低{gpmDetail.stats.excluded_extreme_lo}家</span>
+                <span style={{ color: '#7ab0cc', fontSize: 11 }}>全體：{gpmDetail.stats.total?.toLocaleString()}家</span>
+                <span style={{ color: '#7ab0cc', fontSize: 11 }}>極端值剔除：高{gpmDetail.stats.excluded_extreme_hi}+低{gpmDetail.stats.excluded_extreme_lo}家</span>
               </>}
             </div>
-            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10, lineHeight: 1.6 }}>
+            <div style={{ marginTop: 6, color: '#5a8aaa', fontSize: 10, lineHeight: 1.6 }}>
               評分說明：&lt;10%→0分 ｜ 10%~40%→線性0~10分 ｜ ≥40%→10分 ｜ 毛利率每增加1%加0.01分（&lt;10%時加1分）
             </div>
           </div>
@@ -342,14 +342,14 @@ export default function Scoreboard() {
             </div>
             <ScoreBar score={opiDetail.score} />
             <div style={{ marginTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{opiDetail.rank}</b> / {opiDetail.total?.toLocaleString()}家</span>
-              <span style={{ color: '#3a6080', fontSize: 11 }}>季別：{opiDetail.period}</span>
+              <span style={{ color: '#7ab0cc', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{opiDetail.rank}</b> / {opiDetail.total?.toLocaleString()}家</span>
+              <span style={{ color: '#7ab0cc', fontSize: 11 }}>季別：{opiDetail.period}</span>
               {opiDetail.stats && <>
-                <span style={{ color: '#3a6080', fontSize: 11 }}>全體：{opiDetail.stats.total?.toLocaleString()}家</span>
-                <span style={{ color: '#3a6080', fontSize: 11 }}>極端值剔除：高{opiDetail.stats.excluded_extreme_hi}+低{opiDetail.stats.excluded_extreme_lo}家</span>
+                <span style={{ color: '#7ab0cc', fontSize: 11 }}>全體：{opiDetail.stats.total?.toLocaleString()}家</span>
+                <span style={{ color: '#7ab0cc', fontSize: 11 }}>極端值剔除：高{opiDetail.stats.excluded_extreme_hi}+低{opiDetail.stats.excluded_extreme_lo}家</span>
               </>}
             </div>
-            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10, lineHeight: 1.6 }}>
+            <div style={{ marginTop: 6, color: '#5a8aaa', fontSize: 10, lineHeight: 1.6 }}>
               評分說明：&lt;0%→0分 ｜ 0%~25%→線性0~10分 ｜ ≥25%→10分 ｜ 每增1pp加0.1分（&lt;0%時加1分），上限+5分
             </div>
           </div>
@@ -373,7 +373,7 @@ export default function Scoreboard() {
               ))}
             </div>
             <ScoreBar score={nonOpDetail.score} />
-            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10 }}>
+            <div style={{ marginTop: 6, color: '#5a8aaa', fontSize: 10 }}>
               評分說明：0%→10分 ｜ ±10%→0分 ｜ 越接近0分數越高
             </div>
           </div>
@@ -404,7 +404,7 @@ export default function Scoreboard() {
             </div>
             <ScoreBar score={invDetail.score} />
             <div style={{ marginTop: 6, display: 'flex', gap: 12 }}>
-              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{invDetail.rank}</b> / {invDetail.total?.toLocaleString()}家</span>
+              <span style={{ color: '#7ab0cc', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{invDetail.rank}</b> / {invDetail.total?.toLocaleString()}家</span>
             </div>
           </div>
         )}
