@@ -210,28 +210,7 @@ export default function Scoreboard() {
         )}
       </div>
 
-      {/* 評分規則說明 */}
-      <div style={{ ...S.card, marginTop: 1 }}>
-        <div style={{ ...S.label, marginBottom: 10 }}>評分規則 — 月營收年增率</div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1 }}>
-          {[
-            { range: '年增率 100% ~ 200%', score: '10 分', color: '#3ed888' },
-            { range: '年增率 30% ~ 100%', score: '線性 7 ~ 10 分', color: '#3ed888' },
-            { range: '年增率 -30% ~ 30%', score: '線性 0 ~ 7 分', color: '#90c0dc' },
-            { range: '年增率 ≤ -30%', score: '0 分', color: '#d8a840' },
-            { range: '連續 2 個月 ≥ 200%', score: '10 分（滿分）', color: '#3ed888' },
-            { range: '單月 ≥ 200%', score: '5 分（半滿）', color: '#90c0dc' },
-            { range: '本月或去年同月 < 3000萬', score: '🔘 基期太低，不評', color: '#3a6080' },
-            { range: '極端值（各1.5%）', score: '⚠️ 剔除，不評', color: '#d8a840' },
-          ].map((r, i) => (
-            <div key={i} style={{ padding: '7px 12px', background: '#070a0f',
-              border: '1px solid #0a1420', display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#6a90a8', fontSize: 12 }}>{r.range}</span>
-              <span style={{ color: r.color, fontSize: 12, fontFamily: "'JetBrains Mono',monospace" }}>{r.score}</span>
-            </div>
-          ))}
-        </div>
-      </div>
+
     </div>
   );
 }
