@@ -8,6 +8,7 @@ import SectorComparison from './pages/SectorComparison';
 import Upload from './pages/Upload';
 import RulesManager from './pages/RulesManager';
 import PrivateAnalysis from './pages/PrivateAnalysis';
+import Scoreboard from './pages/Scoreboard';
 import './App.css';
 
 const MAX_WATCHLIST = 30;
@@ -71,6 +72,7 @@ export default function App() {
             <NavLink to="/ranking">🏆 全市場排名</NavLink>
             <NavLink to="/sector">🔍 類股比較</NavLink>
             <NavLink to="/portfolio">★ 私房股</NavLink>
+            <NavLink to="/scoreboard">📊 計分板</NavLink>
             {showUpload && <NavLink to="/upload">📤 上傳資料</NavLink>}
             {showUpload && <NavLink to="/rules">📋 分析規則</NavLink>}
             {showUpload && <NavLink to="/private" style={{ color: '#5a2a2a' }}>🔒</NavLink>}
@@ -84,6 +86,7 @@ export default function App() {
               <Route path="/upload" element={<Upload />} />
               <Route path="/rules" element={<RulesManager />} />
               <Route path="/private" element={<PrivateAnalysis ticker={ticker} />} />
+              <Route path="/scoreboard" element={<Scoreboard />} />
             </Routes>
           </div>
         </main>
