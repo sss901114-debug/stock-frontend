@@ -234,7 +234,7 @@ export default function Scoreboard() {
                 { label: '最新季毛利率', value: gpmDetail.gpm != null ? `${gpmDetail.gpm?.toFixed(2)}%` : '-',
                   color: gpmDetail.gpm >= 40 ? '#3ed888' : gpmDetail.gpm >= 10 ? '#90c0dc' : '#e05050' },
                 { label: '上季毛利率', value: gpmDetail.prev_gpm != null ? `${gpmDetail.prev_gpm?.toFixed(2)}%` : '-', color: '#6a8090' },
-                { label: '環比變化', value: gpmDetail.gpm_diff != null ? `${gpmDetail.gpm_diff > 0 ? '+' : ''}${gpmDetail.gpm_diff?.toFixed(2)}%` : '-',
+                { label: '月增率變化', value: gpmDetail.gpm_diff != null ? `${gpmDetail.gpm_diff > 0 ? '+' : ''}${gpmDetail.gpm_diff?.toFixed(2)}%` : '-',
                   color: gpmDetail.gpm_diff > 0 ? '#3ed888' : gpmDetail.gpm_diff < 0 ? '#e05050' : '#6a8090' },
               ].map(item => (
                 <div key={item.label} style={{ padding: '8px 12px', background: '#080b10', border: '1px solid #0a1420' }}>
