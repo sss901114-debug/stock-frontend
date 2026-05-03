@@ -419,7 +419,7 @@ export default function StockOverview({ ticker }) {
           近12月累計年增率: r.cum_12m_pct != null ? +Number(r.cum_12m_pct).toFixed(1) : null,
         }));
 
-        // 月營收標題含最新數值和環比箭頭
+        // 月營收標題含最新數值和月增率箭頭
         const m0 = mData[0] || {}, m1 = mData[1] || {};
         const rev0 = m0.revenue ? +(m0.revenue/100000).toFixed(2) : null;
         const rev1 = m1.revenue ? +(m1.revenue/100000).toFixed(2) : null;
