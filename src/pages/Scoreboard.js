@@ -52,6 +52,8 @@ export default function Scoreboard() {
   const [stats, setStats] = useState(null);
   const [gpmDetail, setGpmDetail] = useState(null);
   const [gpmLoading, setGpmLoading] = useState(false);
+  const [opiDetail, setOpiDetail] = useState(null);
+  const [opiLoading, setOpiLoading] = useState(false);
 
   // 統計隨查詢一起帶出
 
@@ -95,6 +97,20 @@ export default function Scoreboard() {
       setGpmDetail(await r.json());
     } catch(e) { setGpmDetail({ error: `查詢失敗：${e.message}` }); }
     setGpmLoading(false);
+  };
+
+  const searchOpi = async (t) => {
+    const tv = (t || inputTicker || '').trim();
+    if (!tv) return;
+    setOpiLoading(true); setOpiDetail(null);
+    try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 30000);
+      const r = await fetch(`${API_URL}/api/scoreboard/opi/${tv}`, { signal: controller.signal });
+      clearTimeout(tid);
+      setOpiDetail(await r.json());
+    } catch(e) { setOpiDetail({ error: `查詢失敗：${e.message}` }); }
+    setOpiLoading(false);
   };
 
   const statusBadge = (status) => {
@@ -153,12 +169,12 @@ export default function Scoreboard() {
         <div style={{ display: 'flex', gap: 8 }}>
           <input value={inputTicker}
             onChange={e => setInputTicker(e.target.value.toUpperCase())}
-            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); }}}
+            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); }}}
             style={{ background: '#060910', border: '1px solid #2a5070', padding: '8px 14px',
               color: '#c0d8ea', fontSize: 14, outline: 'none', width: 130,
               fontFamily: "'JetBrains Mono',monospace", letterSpacing: 2 }}
             placeholder="2330" />
-          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); }}
+          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); }}
             disabled={loading}>
             {loading ? '計算中（約10秒）...' : '查詢'}
           </button>
@@ -258,6 +274,40 @@ export default function Scoreboard() {
           </div>
         )}
         {gpmDetail?.error && <div style={{ color: '#e05050', fontSize: 11, marginTop: 8 }}>毛利率：{gpmDetail.error}</div>}
+
+        {/* 營益率分數 */}
+        {opiDetail && !opiDetail.error && opiDetail.status === 'scored' && (
+          <div style={{ marginTop: 8, padding: '14px 16px', background: '#070a0f', border: '1px solid #0f1c2a' }}>
+            <div style={{ ...S.label, marginBottom: 8 }}>營益率得分</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, marginBottom: 10 }}>
+              {[
+                { label: '最新季營益率', value: opiDetail.opi != null ? `${opiDetail.opi?.toFixed(1)}%` : '-',
+                  color: opiDetail.opi >= 25 ? '#3ed888' : opiDetail.opi >= 0 ? '#90c0dc' : '#e05050' },
+                { label: '上季營益率', value: opiDetail.prev_opi != null ? `${opiDetail.prev_opi?.toFixed(1)}%` : '-', color: '#6a8090' },
+                { label: '季增變化', value: opiDetail.opi_diff != null ? `${opiDetail.opi_diff > 0 ? '+' : ''}${opiDetail.opi_diff?.toFixed(1)}%` : '-',
+                  color: opiDetail.opi_diff > 0 ? '#3ed888' : opiDetail.opi_diff < 0 ? '#e05050' : '#6a8090' },
+              ].map(item => (
+                <div key={item.label} style={{ padding: '8px 12px', background: '#080b10', border: '1px solid #0a1420' }}>
+                  <div style={S.label}>{item.label}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 600, color: item.color }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <ScoreBar score={opiDetail.score} />
+            <div style={{ marginTop: 6, display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{opiDetail.rank}</b> / {opiDetail.total?.toLocaleString()}家</span>
+              <span style={{ color: '#3a6080', fontSize: 11 }}>季別：{opiDetail.period}</span>
+              {opiDetail.stats && <>
+                <span style={{ color: '#3a6080', fontSize: 11 }}>全體：{opiDetail.stats.total?.toLocaleString()}家</span>
+                <span style={{ color: '#3a6080', fontSize: 11 }}>極端值剔除：高{opiDetail.stats.excluded_extreme_hi}+低{opiDetail.stats.excluded_extreme_lo}家</span>
+              </>}
+            </div>
+            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10, lineHeight: 1.6 }}>
+              評分說明：&lt;0%→0分 ｜ 0%~25%→線性0~10分 ｜ ≥25%→10分 ｜ 每增1pp加0.1分（&lt;0%時加1分），上限+5分
+            </div>
+          </div>
+        )}
+        {opiDetail?.error && <div style={{ color: '#e05050', fontSize: 11, marginTop: 8 }}>營益率：{opiDetail.error}</div>}
       </div>
 
 
