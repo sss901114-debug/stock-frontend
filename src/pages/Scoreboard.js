@@ -50,6 +50,8 @@ export default function Scoreboard() {
   const [detail, setDetail] = useState(null);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState(null);
+  const [gpmDetail, setGpmDetail] = useState(null);
+  const [gpmLoading, setGpmLoading] = useState(false);
 
   // 統計隨查詢一起帶出
 
@@ -79,6 +81,20 @@ export default function Scoreboard() {
       }
     } catch(e) { setDetail({ error: `查詢失敗：${e.message}` }); }
     setLoading(false);
+  };
+
+  const searchGpm = async (t) => {
+    const tv = (t || inputTicker || '').trim();
+    if (!tv) return;
+    setGpmLoading(true); setGpmDetail(null);
+    try {
+      const controller = new AbortController();
+      const tid = setTimeout(() => controller.abort(), 30000);
+      const r = await fetch(`${API_URL}/api/scoreboard/gpm/${tv}`, { signal: controller.signal });
+      clearTimeout(tid);
+      setGpmDetail(await r.json());
+    } catch(e) { setGpmDetail({ error: `查詢失敗：${e.message}` }); }
+    setGpmLoading(false);
   };
 
   const statusBadge = (status) => {
@@ -137,12 +153,12 @@ export default function Scoreboard() {
         <div style={{ display: 'flex', gap: 8 }}>
           <input value={inputTicker}
             onChange={e => setInputTicker(e.target.value.toUpperCase())}
-            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); }}}
+            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); }}}
             style={{ background: '#060910', border: '1px solid #2a5070', padding: '8px 14px',
               color: '#c0d8ea', fontSize: 14, outline: 'none', width: 130,
               fontFamily: "'JetBrains Mono',monospace", letterSpacing: 2 }}
             placeholder="2330" />
-          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); }}
+          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); }}
             disabled={loading}>
             {loading ? '計算中（約10秒）...' : '查詢'}
           </button>
@@ -208,6 +224,36 @@ export default function Scoreboard() {
         {detail?.error && (
           <div style={{ color: '#e05050', fontSize: 12, marginTop: 12 }}>❌ {detail.error}</div>
         )}
+
+        {/* 毛利率分數 */}
+        {gpmDetail && !gpmDetail.error && gpmDetail.status === 'scored' && (
+          <div style={{ marginTop: 12, padding: '14px 16px', background: '#070a0f', border: '1px solid #0f1c2a' }}>
+            <div style={{ ...S.label, marginBottom: 8 }}>毛利率得分</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 1, marginBottom: 10 }}>
+              {[
+                { label: '最新季毛利率', value: gpmDetail.gpm != null ? `${gpmDetail.gpm?.toFixed(2)}%` : '-',
+                  color: gpmDetail.gpm >= 40 ? '#3ed888' : gpmDetail.gpm >= 10 ? '#90c0dc' : '#e05050' },
+                { label: '上季毛利率', value: gpmDetail.prev_gpm != null ? `${gpmDetail.prev_gpm?.toFixed(2)}%` : '-', color: '#6a8090' },
+                { label: '環比變化', value: gpmDetail.gpm_diff != null ? `${gpmDetail.gpm_diff > 0 ? '+' : ''}${gpmDetail.gpm_diff?.toFixed(2)}%` : '-',
+                  color: gpmDetail.gpm_diff > 0 ? '#3ed888' : gpmDetail.gpm_diff < 0 ? '#e05050' : '#6a8090' },
+              ].map(item => (
+                <div key={item.label} style={{ padding: '8px 12px', background: '#080b10', border: '1px solid #0a1420' }}>
+                  <div style={S.label}>{item.label}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 600, color: item.color }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <ScoreBar score={gpmDetail.score} />
+            <div style={{ marginTop: 6, display: 'flex', gap: 16 }}>
+              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{gpmDetail.rank}</b> / {gpmDetail.total?.toLocaleString()}家</span>
+              <span style={{ color: '#3a6080', fontSize: 11 }}>季別：{gpmDetail.period}</span>
+            </div>
+            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10, lineHeight: 1.6 }}>
+              評分說明：&lt;10%→0分 ｜ 10%~40%→線性0~10分 ｜ ≥40%→10分 ｜ 毛利率每增加1%加0.01分（&lt;10%時加1分）
+            </div>
+          </div>
+        )}
+        {gpmDetail?.error && <div style={{ color: '#e05050', fontSize: 11, marginTop: 8 }}>毛利率：{gpmDetail.error}</div>}
       </div>
 
 
