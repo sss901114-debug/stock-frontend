@@ -83,7 +83,7 @@ export default function App() {
               <Route path="/portfolio" element={<Portfolio setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} />} />
               <Route path="/upload" element={<Upload />} />
               <Route path="/rules" element={<RulesManager />} />
-              <Route path="/private" element={<PrivateAnalysis />} />
+              <Route path="/private" element={<PrivateAnalysis ticker={ticker} />} />
             </Routes>
           </div>
         </main>
