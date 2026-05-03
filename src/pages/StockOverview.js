@@ -10,6 +10,7 @@ export default function StockOverview({ ticker }) {
   const [monthly, setMonthly] = useState([]);
   const [annual, setAnnual] = useState([]);
   const [dividend, setDividend] = useState([]);
+  const [shareholding, setShareholding] = useState([]);
   const [estEps, setEstEps] = useState(null);
   const [inWatchlist, setInWatchlist] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -31,9 +32,11 @@ export default function StockOverview({ ticker }) {
       getAnnual(ticker).catch(() => []),
       getDividend(ticker).catch(() => []),
       getEstEps(ticker).catch(() => null),
-    ]).then(([i, q, m, a, d, e]) => {
+      fetch(`${API_URL}/api/company/${ticker}/shareholding?weeks=16`).then(r=>r.json()).catch(()=>[]),
+    ]).then(([i, q, m, a, d, e, sh]) => {
       setInfo(i); setQuarterly(q); setMonthly(m);
       setAnnual(a); setDividend(d); setEstEps(e);
+      setShareholding(Array.isArray(sh) ? sh : []);
       setLoading(false);
     });
     fetch(`${API_URL}/api/company/${ticker}/close-price`)
@@ -639,8 +642,108 @@ export default function StockOverview({ ticker }) {
         </table>
       </div>
     </div>
+
+    {/* ── 籌碼分析 ── */}
+    {shareholding.length > 0 && (
+      <div style={{ margin: '0 0 32px 0' }}>
+        {sectionTitle('📊 籌碼分析（集保股權分散）')}
+        <ShareholdingChart data={shareholding} />
+      </div>
+    )}
   );
 }
 
 const th = { padding: '10px 12px', textAlign: 'right', fontWeight: 600, borderBottom: '1px solid #2a3a4a', color: '#ddd', whiteSpace: 'nowrap', background: '#070a0f' };
 const td = { padding: '7px 12px', textAlign: 'right', borderBottom: '1px solid #1e2a3a', whiteSpace: 'nowrap' };
+
+
+function ShareholdingChart({ data }) {
+  // 整理資料：按日期分組，只取特定分級
+  const KEY_LEVELS = [1, 9, 10, 11, 12, 13, 14, 15];
+  const LEVEL_SHORT = {
+    1: '散戶(1-999)', 9: '小主力(5萬-10萬)',
+    10: '中主力(10萬-20萬)', 11: '大主力(20萬-40萬)',
+    12: '大主力(40萬-60萬)', 13: '大主力(60萬-80萬)',
+    14: '大主力(80萬-100萬)', 15: '大股東(100萬以上)'
+  };
+
+  // 按日期分組
+  const byDate = {};
+  data.forEach(r => {
+    if (!byDate[r.date]) byDate[r.date] = {};
+    byDate[r.date][r.level] = r;
+  });
+
+  const dates = Object.keys(byDate).sort().reverse().slice(0,16);
+  const latestDate = dates[0];
+  const latest = byDate[latestDate] || {};
+
+  // 最新大股東 vs 散戶
+  const bigHolder = latest[15] || {};
+  const retail = latest[1] || {};
+  const total = latest[17] || {};
+
+  // 趨勢：大股東人數
+  const trendData = dates.slice().reverse().map(d => ({
+    date: d.replace(/(\d{4})(\d{2})(\d{2})/, '$1/$2/$3'),
+    大股東人數: byDate[d][15]?.holders || 0,
+    散戶人數: byDate[d][1]?.holders || 0,
+    大股東持股比: parseFloat(byDate[d][15]?.pct || 0),
+  }));
+
+  return (
+    <div>
+      {/* 摘要卡片 */}
+      <div style={{ display: 'flex', gap: 12, marginBottom: 16, flexWrap: 'wrap' }}>
+        {[
+          { label: '大股東人數（100萬股以上）', value: (bigHolder.holders||0).toLocaleString(), color: '#f0a500' },
+          { label: '大股東持股比%', value: bigHolder.pct ? `${bigHolder.pct}%` : '-', color: '#4fc8a0' },
+          { label: '散戶人數（999股以下）', value: (retail.holders||0).toLocaleString(), color: '#7ab0cc' },
+          { label: '總股東人數', value: (total.holders||0).toLocaleString(), color: '#aaa' },
+        ].map(c => (
+          <div key={c.label} style={{ background:'#080c14', border:'1px solid #1e2a3a', borderRadius:8,
+            padding:'12px 18px', minWidth:170, flex:1 }}>
+            <div style={{ color:'#7ab0cc', fontSize:11, marginBottom:4 }}>{c.label}</div>
+            <div style={{ color:c.color, fontSize:20, fontWeight:700 }}>{c.value}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* 趨勢表格 */}
+      <div style={{ overflowX:'auto' }}>
+        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:12 }}>
+          <thead>
+            <tr style={{ background:'#070a0f' }}>
+              <th style={{ ...th, textAlign:'left', minWidth:100 }}>日期</th>
+              <th style={th}>大股東人數</th>
+              <th style={th}>大股東持股%</th>
+              <th style={th}>散戶人數</th>
+              <th style={th}>散戶持股%</th>
+              <th style={th}>總股東人數</th>
+            </tr>
+          </thead>
+          <tbody>
+            {dates.map((d, i) => {
+              const row = byDate[d] || {};
+              const big = row[15] || {};
+              const ret = row[1] || {};
+              const tot = row[17] || {};
+              const dateStr = d.replace(/(\d{4})(\d{2})(\d{2})/, '$1/$2/$3');
+              return (
+                <tr key={d} style={{ background: i%2===0 ? '#080b10' : '#070a0e' }}>
+                  <td style={{ ...td, textAlign:'left', color:'#aaa' }}>{dateStr}</td>
+                  <td style={{ ...td, color:'#f0a500', fontWeight:i===0?700:400 }}>{(big.holders||0).toLocaleString()}</td>
+                  <td style={{ ...td, color:'#4fc8a0' }}>{big.pct ? `${big.pct}%` : '-'}</td>
+                  <td style={{ ...td, color:'#7ab0cc' }}>{(ret.holders||0).toLocaleString()}</td>
+                  <td style={{ ...td, color:'#9090b0' }}>{ret.pct ? `${ret.pct}%` : '-'}</td>
+                  <td style={{ ...td, color:'#aaa' }}>{(tot.holders||0).toLocaleString()}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
