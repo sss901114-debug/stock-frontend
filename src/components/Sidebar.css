@@ -1,88 +1,113 @@
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@700;800&family=JetBrains+Mono:wght@400;500&family=Barlow:wght@300;400;500&display=swap');
+
 .sidebar {
   width: 200px;
-  background: #070a0f;
-  color: var(--text-primary);
+  background: #060910;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   flex-shrink: 0;
-  border-right: 1px solid #141e2c;
+  border-right: 1px solid #1a2a3c;
 }
 
+/* ── LOGO 區 ── */
 .sidebar-header {
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 14px 14px 12px;
-  background: #0b101a;
-  border-bottom: 2px solid #1e3a52;
+  padding: 14px 12px 12px;
+  background: linear-gradient(180deg, #0a1525 0%, #070e1a 100%);
+  border-bottom: 1px solid #1a3050;
   position: relative;
   cursor: default;
   user-select: none;
+  overflow: hidden;
+}
+
+.sidebar-header::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #4090c0, #80d0ff, #4090c0, transparent);
 }
 
 .sidebar-header::after {
   content: '';
   position: absolute;
-  bottom: -2px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, #6aa0c0, #b0d8f0, #6aa0c0);
+  top: 0; left: -100%; width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(100,180,255,0.04), transparent);
+  animation: sweep 4s infinite;
 }
 
-.sidebar-logo { font-size: 20px; }
+@keyframes sweep { 0%{left:-100%} 100%{left:200%} }
 
-.sidebar-title {
-  font-family: var(--font-title);
-  font-weight: 700;
-  font-size: 13px;
-  letter-spacing: 2px;
-  background: linear-gradient(135deg, #c0d8ea, #eaf4ff, #a0c8e0);
+.sidebar-logo { font-size: 18px; z-index: 1; }
+
+.sidebar-title-block { z-index: 1; }
+
+.sidebar-title-main {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 800;
+  font-size: 17px;
+  letter-spacing: 3px;
+  line-height: 1.1;
+  /* 立體冷光效果 */
+  background: linear-gradient(180deg, #ffffff 0%, #c0e8ff 40%, #70b8e8 70%, #4090c0 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  line-height: 1.3;
+  filter: drop-shadow(0 0 6px rgba(100,200,255,0.5)) drop-shadow(0 2px 4px rgba(0,0,0,0.8));
+  text-shadow: none;
 }
 
+.sidebar-title-sub {
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 700;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #5090b8;
+  margin-top: 2px;
+  text-shadow: 0 0 8px rgba(80,160,200,0.6);
+}
+
+/* ── 區塊 ── */
 .sidebar-section {
-  padding: 10px 10px;
-  border-bottom: 1px solid #0c1420;
+  padding: 10px;
+  border-bottom: 1px solid #0e1c2c;
 }
 
 .sidebar-label {
-  font-size: 9px;
-  color: #5a8aaa;
+  font-size: 10px;
   font-weight: 700;
-  letter-spacing: 3px;
+  letter-spacing: 2px;
+  color: #7ab0d0;
+  font-family: 'Rajdhani', sans-serif;
   margin-bottom: 8px;
-  font-family: var(--font-title);
+  text-shadow: 0 0 8px rgba(100,180,220,0.3);
 }
 
+/* ── 搜尋框 ── */
 .search-box { position: relative; }
 
 .search-box input {
   width: 100%;
-  background: #060910;
-  border: 1px solid #3a6080;
+  background: #0a1220;
+  border: 1px solid #2a5070;
   padding: 6px 10px;
-  color: #6a90b0;
-  box-shadow: 0 0 0 1px #1e3a52 inset;
+  color: #90c0dc;
   font-size: 11px;
   outline: none;
-  font-family: var(--font-mono);
-  border-radius: 0;
+  font-family: 'JetBrains Mono', monospace;
 }
 
-.search-box input::placeholder { color: #5a8aaa; }
+.search-box input::placeholder { color: #3a6080; }
 
 .search-results {
   position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  top: 100%; left: 0; right: 0;
   background: #0d1828;
-  border: 1px solid #1e3040;
+  border: 1px solid #2a4060;
   border-top: none;
   z-index: 100;
   max-height: 200px;
@@ -101,8 +126,8 @@
 .search-item:hover { background: #111e30; }
 
 .search-ticker {
-  font-family: var(--font-title);
-  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  font-size: 13px;
   font-weight: 700;
   background: linear-gradient(135deg, #70a8c8, #b0d8f0);
   -webkit-background-clip: text;
@@ -111,7 +136,7 @@
   min-width: 34px;
 }
 
-.search-name { font-size: 11px; color: #6a90b0; }
+.search-name { font-size: 11px; color: #5a8090; }
 
 .current-stock {
   margin-top: 6px;
@@ -120,23 +145,23 @@
   align-items: center;
   padding: 6px 10px;
   background: #0d1828;
-  border: 1px solid #1e3040;
+  border: 1px solid #2a4060;
   cursor: pointer;
   position: relative;
+  color: #90b8d0;
+  font-size: 12px;
 }
 
 .current-stock::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 15%;
-  bottom: 15%;
+  left: 0; top: 15%; bottom: 15%;
   width: 2px;
   background: linear-gradient(180deg, transparent, #80b8d8, transparent);
 }
 
 .current-ticker {
-  font-family: var(--font-title);
+  font-family: 'Rajdhani', sans-serif;
   font-size: 11px;
   font-weight: 700;
   background: #1e3a52;
@@ -145,22 +170,57 @@
   letter-spacing: 1px;
 }
 
+/* ── 私房股群組按鈕 ── */
+.pg-groups { display: flex; flex-direction: column; gap: 2px; }
+
+.pg-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 10px;
+  background: #0d1828;
+  border: 1px solid #1e3040;
+  cursor: pointer;
+  font-size: 11px;
+  color: #7ab0cc;
+  font-family: 'Rajdhani', sans-serif;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.pg-btn:hover { background: #111e30; border-color: #2a5070; }
+
+.pg-btn.active {
+  background: #0f1e32;
+  border-color: #3a7090;
+  color: #a0d0e8;
+}
+
+.pg-arrow { font-size: 9px; color: #3a6080; }
+
+.pg-stocks {
+  background: #080c14;
+  border: 1px solid #0e1c2c;
+  border-top: none;
+}
+
+/* ── 追蹤清單 ── */
 .watchlist-item {
   display: flex;
   align-items: center;
   padding: 6px 10px;
   border-bottom: 1px solid #0a0e14;
   cursor: pointer;
-  position: relative;
+  gap: 6px;
 }
 
 .watchlist-item:hover { background: #0c1420; }
 
-.wl-name { font-size: 11px; color: #5a7a92; margin-left: 6px; }
+.wl-name { font-size: 11px; color: #5a7a92; }
 
 .empty-list {
-  padding: 10px;
+  padding: 8px 10px;
   font-size: 11px;
-  color: #3a6080;
+  color: #2a4060;
   text-align: center;
 }
