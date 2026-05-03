@@ -209,67 +209,7 @@ ${mRevLines}
         )}
       </div>
 
-      {/* ── 2. AI 私密問答 ── */}
-      <div style={S.sec}>
-        <span style={S.label}>🤖 二、AI 私密問答（不對外顯示）</span>
-        <textarea value={aiPrompt} onChange={e => setAiPrompt(e.target.value)}
-          style={{ ...S.input, height: 90, resize: 'vertical' }}
-          placeholder={`針對 ${analysisTicker} 或任何投資問題，直接問...`} />
-        <button style={S.btn()} onClick={runAi} disabled={aiLoading}>
-          {aiLoading ? '分析中...' : '送出'}
-        </button>
-        {aiResult && (
-          <div style={{ marginTop: 12, color: '#a0c0d8', fontSize: 14, lineHeight: 1.9, whiteSpace: 'pre-wrap', borderTop: '1px solid #1a2a3c', paddingTop: 12 }}>
-            {aiResult}
-          </div>
-        )}
-      </div>
 
-      {/* ── 3. 私密筆記 ── */}
-      <div style={S.sec}>
-        <span style={S.label}>{editId ? '✏️ 編輯筆記' : '✏️ 三、新增分析筆記'}</span>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 8 }}>
-          <input value={ticker} onChange={e => setTicker(e.target.value.toUpperCase())}
-            style={{ ...S.input, width: 110, marginBottom: 0 }} placeholder="代號" />
-          <input value={title} onChange={e => setTitle(e.target.value)}
-            style={{ ...S.input, flex: 1, marginBottom: 0 }} placeholder="標題" />
-        </div>
-        <textarea value={noteContent} onChange={e => setNoteContent(e.target.value)}
-          style={{ ...S.input, height: 130, resize: 'vertical', lineHeight: 1.8 }}
-          placeholder="私密投資邏輯、買賣紀錄、注意事項..." />
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <button style={S.btn()} onClick={saveNote} disabled={saving}>{saving ? '儲存中...' : (editId ? '更新' : '儲存')}</button>
-          {editId && <button style={S.btn('#3a3a3a')} onClick={() => { setEditId(null); setTitle(''); setNoteContent(''); setTicker(''); }}>取消</button>}
-          {msg && <span style={{ color: '#3ed888', fontSize: 12 }}>{msg}</span>}
-        </div>
-      </div>
-
-      {/* ── 4. 筆記清單 ── */}
-      <div style={S.sec}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-          <span style={S.label}>📋 四、分析筆記（{notes.length} 筆）</span>
-          <input value={filterTicker} onChange={e => setFilterTicker(e.target.value)}
-            style={{ ...S.input, width: 110, marginBottom: 0, fontSize: 11, padding: '4px 8px' }} placeholder="篩選代號..." />
-        </div>
-        {filtered.length === 0
-          ? <div style={{ color: '#2a4060', fontSize: 12 }}>尚無筆記</div>
-          : filtered.map(n => (
-            <div key={n.id} style={{ borderBottom: '1px solid #0f1c2a', padding: '10px 0' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                <div>
-                  {n.ticker && <span style={{ background: '#1e3a52', color: '#90c0dc', padding: '2px 8px', fontSize: 11, fontFamily: "'Rajdhani',sans-serif", fontWeight: 700, marginRight: 8 }}>{n.ticker}</span>}
-                  <span style={{ color: '#c0d8ea', fontSize: 14, fontWeight: 500 }}>{n.title}</span>
-                  <span style={{ color: '#2a4060', fontSize: 10, marginLeft: 10 }}>{n.created_at?.slice(0,10)}</span>
-                </div>
-                <div>
-                  <button style={{ ...S.btn('#1e3a52'), padding: '3px 10px', fontSize: 11 }} onClick={() => editNote(n)}>編輯</button>
-                  <button style={{ ...S.btn('#3a1e1e'), padding: '3px 10px', fontSize: 11 }} onClick={() => deleteNote(n.id)}>刪除</button>
-                </div>
-              </div>
-              {n.content && <div style={{ color: '#6a90a8', fontSize: 13, marginTop: 6, lineHeight: 1.7, whiteSpace: 'pre-wrap' }}>{n.content}</div>}
-            </div>
-          ))}
-      </div>
     </div>
   );
 }
