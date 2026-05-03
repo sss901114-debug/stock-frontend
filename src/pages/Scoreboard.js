@@ -54,6 +54,8 @@ export default function Scoreboard() {
   const [gpmLoading, setGpmLoading] = useState(false);
   const [opiDetail, setOpiDetail] = useState(null);
   const [opiLoading, setOpiLoading] = useState(false);
+  const [nonOpDetail, setNonOpDetail] = useState(null);
+  const [invDetail, setInvDetail] = useState(null);
 
   // 統計隨查詢一起帶出
 
@@ -113,6 +115,21 @@ export default function Scoreboard() {
     setOpiLoading(false);
   };
 
+  const searchNonOp = async (t) => {
+    const tv = (t || inputTicker || '').trim(); if (!tv) return;
+    try {
+      const r = await fetch(`${API_URL}/api/scoreboard/non-op/${tv}`);
+      setNonOpDetail(await r.json());
+    } catch(e) {}
+  };
+  const searchInv = async (t) => {
+    const tv = (t || inputTicker || '').trim(); if (!tv) return;
+    try {
+      const r = await fetch(`${API_URL}/api/scoreboard/inv/${tv}`);
+      setInvDetail(await r.json());
+    } catch(e) {}
+  };
+
   const statusBadge = (status) => {
     const map = {
       scored: { label: '✅ 有效評分', color: '#3ed888' },
@@ -169,12 +186,12 @@ export default function Scoreboard() {
         <div style={{ display: 'flex', gap: 8 }}>
           <input value={inputTicker}
             onChange={e => setInputTicker(e.target.value.toUpperCase())}
-            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); }}}
+            onKeyDown={e => { if(e.key==='Enter') { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); searchNonOp(inputTicker); searchInv(inputTicker); }}}
             style={{ background: '#060910', border: '1px solid #2a5070', padding: '8px 14px',
               color: '#c0d8ea', fontSize: 14, outline: 'none', width: 130,
               fontFamily: "'JetBrains Mono',monospace", letterSpacing: 2 }}
             placeholder="2330" />
-          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); }}
+          <button style={S.btn} onClick={() => { setTicker(inputTicker); search(inputTicker); searchGpm(inputTicker); searchOpi(inputTicker); searchNonOp(inputTicker); searchInv(inputTicker); }}
             disabled={loading}>
             {loading ? '計算中（約10秒）...' : '查詢'}
           </button>
@@ -308,6 +325,59 @@ export default function Scoreboard() {
           </div>
         )}
         {opiDetail?.error && <div style={{ color: '#e05050', fontSize: 11, marginTop: 8 }}>營益率：{opiDetail.error}</div>}
+
+        {/* 業外收支 */}
+        {nonOpDetail && nonOpDetail.status === 'scored' && (
+          <div style={{ marginTop: 8, padding: '14px 16px', background: '#070a0f', border: '1px solid #0f1c2a' }}>
+            <div style={{ ...S.label, marginBottom: 8 }}>業外收支/營業收入得分</div>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 1, marginBottom: 10 }}>
+              {[
+                { label: '業外收支/營收', value: nonOpDetail.ratio != null ? `${nonOpDetail.ratio > 0?'+':''}${nonOpDetail.ratio?.toFixed(1)}%` : '-',
+                  color: Math.abs(nonOpDetail.ratio) < 3 ? '#3ed888' : Math.abs(nonOpDetail.ratio) < 7 ? '#d8a840' : '#e05050' },
+                { label: '排名', value: nonOpDetail.rank ? `#${nonOpDetail.rank} / ${nonOpDetail.total?.toLocaleString()}家` : '-', color: '#d8a840' },
+              ].map(item => (
+                <div key={item.label} style={{ padding: '8px 12px', background: '#080b10', border: '1px solid #0a1420' }}>
+                  <div style={S.label}>{item.label}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 15, fontWeight: 600, color: item.color }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <ScoreBar score={nonOpDetail.score} />
+            <div style={{ marginTop: 6, color: '#2a4060', fontSize: 10 }}>
+              評分說明：0%→10分 ｜ ±10%→0分 ｜ 越接近0分數越高
+            </div>
+          </div>
+        )}
+
+        {/* 存貨與週轉天數 */}
+        {invDetail && invDetail.status === 'scored' && (
+          <div style={{ marginTop: 8, padding: '14px 16px', background: '#070a0f', border: '1px solid #0f1c2a' }}>
+            <div style={{ ...S.label, marginBottom: 8 }}>存貨 × 存貨週轉天數得分</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 1, marginBottom: 10 }}>
+              {[
+                { label: '存貨（億）', value: invDetail.inv != null ? invDetail.inv?.toFixed(2) : '-',
+                  color: invDetail.inv > invDetail.prev_inv ? '#3ed888' : '#e05050' },
+                { label: '上季存貨（億）', value: invDetail.prev_inv?.toFixed(2), color: '#6a8090' },
+                { label: '週轉天數', value: invDetail.inv_days != null ? `${invDetail.inv_days}天` : '-',
+                  color: invDetail.days_down ? '#3ed888' : '#e05050' },
+                { label: '上季週轉天數', value: invDetail.prev_inv_days != null ? `${invDetail.prev_inv_days}天` : '-', color: '#6a8090' },
+              ].map(item => (
+                <div key={item.label} style={{ padding: '8px 10px', background: '#080b10', border: '1px solid #0a1420' }}>
+                  <div style={S.label}>{item.label}</div>
+                  <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 14, fontWeight: 600, color: item.color }}>{item.value}</div>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginBottom: 10, padding: '6px 12px', background: '#0a1020', border: '1px solid #1a3040',
+              color: invDetail.score === 10 ? '#3ed888' : invDetail.score >= 7.5 ? '#d8a840' : '#8ab0cc', fontSize: 13, fontWeight: 600 }}>
+              組合判斷：{invDetail.combo_label}
+            </div>
+            <ScoreBar score={invDetail.score} />
+            <div style={{ marginTop: 6, display: 'flex', gap: 12 }}>
+              <span style={{ color: '#3a6080', fontSize: 11 }}>排名：<b style={{ color: '#d8a840' }}>#{invDetail.rank}</b> / {invDetail.total?.toLocaleString()}家</span>
+            </div>
+          </div>
+        )}
       </div>
 
 
