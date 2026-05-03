@@ -385,10 +385,10 @@ export default function Scoreboard() {
                         style={{ cursor: 'pointer', background: i%2===0?'#0e0808':'#0d0707', borderBottom: '1px solid #090d14' }}
                         onMouseEnter={e => e.currentTarget.style.background='#1a1010'}
                         onMouseLeave={e => e.currentTarget.style.background=i%2===0?'#0e0808':'#0d0707'}>
-                        <td style={{ padding: '5px 10px', textAlign: 'center', color: '#4a3030', fontFamily: "'JetBrains Mono',monospace" }}>{rank}</td>
+                        <td style={{ padding: '5px 10px', textAlign: 'center', color: '#8a7070', fontFamily: "'JetBrains Mono',monospace" }}>{rank}</td>
                         <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'Rajdhani',sans-serif",
-                          fontWeight: 700, color: '#c89080' }}>{r.ticker}</td>
-                        <td style={{ padding: '5px 10px', color: '#7a6060', whiteSpace: 'nowrap' }}>{r.name}</td>
+                          fontWeight: 700, color: '#d8b0a0' }}>{r.ticker}</td>
+                        <td style={{ padding: '5px 10px', color: '#b0a0a0', whiteSpace: 'nowrap' }}>{r.name}</td>
                         <td style={{ padding: '5px 10px', textAlign: 'center', fontFamily: "'JetBrains Mono',monospace",
                           fontWeight: 700, color: '#e05050' }}>{r.total}</td>
                         <td style={{ padding: '5px 10px', textAlign: 'right', fontFamily: "'JetBrains Mono',monospace",
