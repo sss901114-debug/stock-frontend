@@ -109,7 +109,7 @@ export default function StockOverview({ ticker }) {
         <tbody>
           {rows.map((row, i) => (
             <tr key={i} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
-              <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+              <td style={{ ...td, textAlign: 'left', color: '#8ab8d0', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
               {aData.map(r => {
                 const val = row.key ? r[row.key] : null;
                 const sepStyle = row.sep ? { borderBottom: '2px solid #ffffff' } : {};
@@ -233,10 +233,18 @@ export default function StockOverview({ ticker }) {
       {/* ── AI 分析報告 ── */}
       {(aiReport || aiLoading) && (
         <div style={{ background: '#070a0f', border: '1px solid #1a2a3c', borderRadius: 0, padding: '20px 24px', marginBottom: 1 }}>
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
-            <span style={{ color: '#a8d0e8', fontWeight: 700, fontSize: 15, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>🤖 AI個股財務健診報告</span>
-            <span style={{ color: '#6a98b8', fontSize: 12 }}>（報告日期：{new Date().getFullYear()}年{String(new Date().getMonth()+1).padStart(2,'0')}月{String(new Date().getDate()).padStart(2,'0')}日）</span>
-          </div>
+          {(() => {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth()+1).padStart(2,'0');
+            const d = String(now.getDate()).padStart(2,'0');
+            return (
+              <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 14 }}>
+                <span style={{ color: '#a8d0e8', fontWeight: 700, fontSize: 15, fontFamily: "'Rajdhani',sans-serif", letterSpacing: 2 }}>🤖 AI個股財務健診報告</span>
+                <span style={{ color: '#6a98b8', fontSize: 12 }}>（報告日期：{y}年{m}月{d}日）</span>
+              </div>
+            );
+          })()}
           {aiLoading ? (
             <div style={{ color: '#aaa', textAlign: 'center', padding: 32 }}>⏳ AI 正在分析中，約需 30-60 秒...</div>
           ) : (
@@ -592,7 +600,7 @@ export default function StockOverview({ ticker }) {
               { label: '近12個月累計營收年增率(%)', fn: (r) => r.cum_12m_pct != null ? Number(r.cum_12m_pct) : null, cf: colorPos },
             ].map((row, ri) => (
               <tr key={row.label} style={{ background: ri % 2 === 0 ? '#080b10' : '#070a0e' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#8ab8d0', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {mData.map((r, i) => {
                   const val = row.fn(r, i);
                   const display = val == null ? '-' : (typeof val === 'string' ? val : val.toFixed(2) + (row.label.includes('億') ? '' : '%'));
@@ -621,7 +629,7 @@ export default function StockOverview({ ticker }) {
               { label: '發放率(%)', key: 'payout_ratio_pct', cf: () => '#ccc' },
             ].map((row, i) => (
               <tr key={row.key} style={{ background: i % 2 === 0 ? '#080b10' : '#070a0e' }}>
-                <td style={{ ...td, textAlign: 'left', color: '#5a8090', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
+                <td style={{ ...td, textAlign: 'left', color: '#8ab8d0', fontWeight: 500, ...(row.sep ? { borderBottom: '2px solid #ffffff' } : {}) }}>{row.label}</td>
                 {dividend.map(r => (
                   <td key={r.year} style={{ ...td, color: row.cf(r[row.key]) }}>{fmt(r[row.key])}</td>
                 ))}
