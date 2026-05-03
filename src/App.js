@@ -7,6 +7,7 @@ import Portfolio from './pages/Portfolio';
 import SectorComparison from './pages/SectorComparison';
 import Upload from './pages/Upload';
 import RulesManager from './pages/RulesManager';
+import PrivateAnalysis from './pages/PrivateAnalysis';
 import './App.css';
 
 const MAX_WATCHLIST = 30;
@@ -30,10 +31,7 @@ export default function App() {
     clickCount.current += 1;
     if (clickTimer.current) clearTimeout(clickTimer.current);
     if (clickCount.current >= SECRET_CLICKS) {
-      setShowUpload(prev => {
-        const next = !prev;
-        return next;
-      });
+      setShowUpload(prev => !prev);
       clickCount.current = 0;
     } else {
       clickTimer.current = setTimeout(() => { clickCount.current = 0; }, 2000);
@@ -43,10 +41,7 @@ export default function App() {
   const addToWatchlist = useCallback((ticker, name) => {
     setWatchlist(prev => {
       if (prev.find(w => w.ticker === ticker)) return prev;
-      if (prev.length >= MAX_WATCHLIST) {
-        alert(`私房股最多 ${MAX_WATCHLIST} 檔`);
-        return prev;
-      }
+      if (prev.length >= MAX_WATCHLIST) { alert(`私房股最多 ${MAX_WATCHLIST} 檔`); return prev; }
       const next = [...prev, { ticker, name }];
       saveWatchlist(next);
       return next;
@@ -68,7 +63,8 @@ export default function App() {
   return (
     <BrowserRouter>
       <div className="app-layout">
-        <Sidebar ticker={ticker} setTicker={setTicker} watchlist={watchlist} removeFromWatchlist={removeFromWatchlist} onLogoClick={handleLogoClick} />
+        <Sidebar ticker={ticker} setTicker={setTicker} watchlist={watchlist}
+          removeFromWatchlist={removeFromWatchlist} onLogoClick={handleLogoClick} />
         <main className="main-content">
           <nav className="top-nav">
             <NavLink to="/" end>📊 個股總覽</NavLink>
@@ -77,15 +73,17 @@ export default function App() {
             <NavLink to="/portfolio">★ 私房股</NavLink>
             {showUpload && <NavLink to="/upload">📤 上傳資料</NavLink>}
             {showUpload && <NavLink to="/rules">📋 分析規則</NavLink>}
+            {showUpload && <NavLink to="/private" style={{ color: '#5a2a2a' }}>🔒</NavLink>}
           </nav>
           <div className="page-content">
             <Routes>
-              <Route path="/" element={<StockOverview ticker={ticker} />} />
+              <Route path="/" element={<StockOverview ticker={ticker} addToWatchlist={addToWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/ranking" element={<MarketRanking setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/sector" element={<SectorComparison setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} isInWatchlist={isInWatchlist} />} />
               <Route path="/portfolio" element={<Portfolio setTicker={setTicker} watchlist={watchlist} addToWatchlist={addToWatchlist} removeFromWatchlist={removeFromWatchlist} />} />
               <Route path="/upload" element={<Upload />} />
               <Route path="/rules" element={<RulesManager />} />
+              <Route path="/private" element={<PrivateAnalysis />} />
             </Routes>
           </div>
         </main>
