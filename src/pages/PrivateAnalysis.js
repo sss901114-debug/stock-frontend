@@ -100,7 +100,7 @@ export default function PrivateAnalysis() {
       <div style={{ background: '#0a0f1a', border: '1px solid #2a4a62', padding: '40px 48px', minWidth: 320 }}>
         <div style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 18, fontWeight: 700,
           letterSpacing: 3, color: '#90c0dc', marginBottom: 24, textAlign: 'center' }}>
-          🔒 私密分析
+          📡 財報雷達站
         </div>
         <div style={{ color: '#3a6080', fontSize: 10, letterSpacing: 2, marginBottom: 6,
           fontFamily: "'Rajdhani',sans-serif", fontWeight: 700 }}>PASSWORD</div>
@@ -125,7 +125,7 @@ export default function PrivateAnalysis() {
       <div style={{ fontFamily: "'Rajdhani',sans-serif", fontSize: 20, fontWeight: 700,
         letterSpacing: 3, color: '#90c0dc', marginBottom: 16,
         borderBottom: '1px solid #1a2a3c', paddingBottom: 10 }}>
-        🔒 私密個股分析
+        📡 財報雷達站
       </div>
 
       {/* ── 新增/編輯筆記 ── */}
