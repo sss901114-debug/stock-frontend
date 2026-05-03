@@ -316,8 +316,8 @@ ${mRevLines}
                   </div>
                   <div style={{ display: 'flex', gap: 8, marginTop: 6, flexWrap: 'wrap' }}>
                     {Object.entries(item.lags).map(([lag, v]) => (
-                      <span key={lag} style={{ fontSize: 10, color: lag==item.best_lag?'#d8a840':'#3a6080',
-                        background: lag==item.best_lag?'#1e2a0a':'#0a0d12', padding: '2px 8px' }}>
+                      <span key={lag} style={{ fontSize: 11, color: lag==item.best_lag?'#f0c040':'#7ab0cc',
+                        background: lag==item.best_lag?'#2a2800':'#0d1620', padding: '3px 10px', borderRadius: 2 }}>
                         {lag}季落後: r={v.r}
                       </span>
                     ))}
