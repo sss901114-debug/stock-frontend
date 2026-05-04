@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useRef } from 'react';import Shareholding from './pages/Shareholding';
+import React, { useState, useCallback, useRef } from 'react';
+import Shareholding from './pages/Shareholding';
 import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import StockOverview from './pages/StockOverview';
